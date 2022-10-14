@@ -2,4 +2,4 @@
 This project was bootstrapped with Fastify-CLI.
 
 # Endpoints for now 
-/ displays HEY PJO
+/ displays HEY PJO - other endpoints later
