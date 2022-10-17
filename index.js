@@ -13,10 +13,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const fastify_1 = __importDefault(require("fastify"));
+const fastifyCORS = require("@fastify/cors");
 const server = (0, fastify_1.default)();
 server.get('/ping', (request, reply) => __awaiter(void 0, void 0, void 0, function* () {
     return 'pong\n';
 }));
+// cors settings
+const corsOptions = {
+    origin: "*",
+    methods: "GET,PUT,POST,DELETE,OPTIONS,HEAD",
+};
+server.register(fastifyCORS, corsOptions);
 // for liveliness probe
 server.get('/', (request, reply) => __awaiter(void 0, void 0, void 0, function* () {
     return 'ok';
