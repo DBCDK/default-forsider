@@ -4,7 +4,7 @@ pipeline {
     agent {
         label 'devel10-head'
     }
-    triggers{
+    triggers {
         // @TODO parameters on githubPush .. eg. branch
         githubPush()
     }
@@ -19,9 +19,7 @@ pipeline {
     stages {
         stage('Echo fisk') {
             steps {
-                script {
-                    sh "echo fisk and hund"
-                }
+                sh "echo fisk and hund"
             }
         }
 
@@ -37,11 +35,9 @@ pipeline {
                 branch "main"
             }
             steps {
-                dir("deploy") {
-                    sh """#!/usr/bin/env bash
+                sh """#!/usr/bin/env bash
 						set-new-version configuration.yaml ${env.GITLAB_PRIVATE_TOKEN} ${env.GITLAB_ID} ${env.BUILD_NUMBER} -b staging
 					"""
-                }
             }
         }
     }
