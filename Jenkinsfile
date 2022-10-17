@@ -20,7 +20,7 @@ pipeline {
         stage('Echo fisk') {
             steps {
                 script {
-                    sh "echo fisk and hest"
+                    sh "echo fisk and hund"
                 }
             }
         }
