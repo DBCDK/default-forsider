@@ -17,6 +17,10 @@ const server = (0, fastify_1.default)();
 server.get('/ping', (request, reply) => __awaiter(void 0, void 0, void 0, function* () {
     return 'pong\n';
 }));
+// for liveliness probe
+server.get('/', (request, reply) => __awaiter(void 0, void 0, void 0, function* () {
+    return 'ok';
+}));
 server.listen({ port: 3000 }, (err, address) => {
     if (err) {
         console.error(err);
