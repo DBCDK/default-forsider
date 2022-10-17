@@ -1,0 +1,28 @@
+{
+  "name": "default-forsider",
+  "version": "1.0.0",
+  "description": "This project was bootstrapped with Fastify-CLI.",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DBCDK/default-forsider.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/DBCDK/default-forsider/issues"
+  },
+  "homepage": "https://github.com/DBCDK/default-forsider#readme",
+  "dependencies": {
+    "fastify": "^4.8.1"
+  },
+  "devDependencies": {
+    "@types/node": "^18.8.5",
+    "typescript": "^4.8.4"
+  }
+}
