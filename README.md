@@ -1,4 +1,4 @@
-# This is the default forside service [urltoservice])
+# This is the default forside service [http://default-forsider.febib-staging.svc.cloud.dbc.dk/hello])
 This project was bootstrapped with Fastify-CLI.
 
 # To run local
