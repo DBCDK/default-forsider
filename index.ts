@@ -4,6 +4,32 @@ const fastifyCORS = require("@fastify/cors");
 
 const server = fastify()
 
+// interface for re
+// quest object
+/**
+ * Define interface for title, materialType parameters
+ */
+interface IDefaultQuerystring {
+    title: string;
+    materialType: string;
+}
+
+interface IHeaders {
+    'h-Custom': string;
+}
+// Typed endpoint - defaultcover
+server.get<{
+    Querystring: IDefaultQuerystring,
+    Headers: IHeaders
+}>('/defaultcover', async (request, reply) => {
+    const { title, materialType } = request.query
+    const customerHeader = request.headers['h-Custom']
+    // do something with request data
+
+    return `get me ${title} and ${materialType}!`
+})
+
+
 server.get('/ping', async (request, reply) => {
     return 'pong\n'
 })
@@ -13,7 +39,7 @@ server.get('/', async (request, reply) => {
     return 'ok'
 })
 
-// for yo 
+// for yo
 server.get('/hello', async (request, reply) => {
     return 'Yo pjo'
 })

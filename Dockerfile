@@ -11,7 +11,7 @@ COPY . .
 
 # install node packages
 RUN npm set progress=false && npm config set depth 0 && \
-    npm install
+    npm install && npm run build
 
 # ---- Release ----
 FROM $NODE_BASEIMAGE AS release
