@@ -18,15 +18,13 @@ const server = (0, fastify_1.default)();
 server.get('/ping', (request, reply) => __awaiter(void 0, void 0, void 0, function* () {
     return 'pong\n';
 }));
-// cors settings
-const corsOptions = {
-    origin: "*",
-    methods: "GET,PUT,POST,DELETE,OPTIONS,HEAD",
-};
-server.register(fastifyCORS, corsOptions);
 // for liveliness probe
 server.get('/', (request, reply) => __awaiter(void 0, void 0, void 0, function* () {
     return 'ok';
+}));
+// for yo 
+server.get('/hello', (request, reply) => __awaiter(void 0, void 0, void 0, function* () {
+    return 'Yo pjo';
 }));
 server.listen({ port: 3000, host: '0.0.0.0' }, (err, address) => {
     if (err) {

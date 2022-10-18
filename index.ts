@@ -8,17 +8,14 @@ server.get('/ping', async (request, reply) => {
     return 'pong\n'
 })
 
-// cors settings
-const corsOptions = {
-    origin: "*",
-    methods: "GET,PUT,POST,DELETE,OPTIONS,HEAD",
-};
-
-server.register(fastifyCORS, corsOptions);
-
 // for liveliness probe
 server.get('/', async (request, reply) => {
     return 'ok'
+})
+
+// for yo 
+server.get('/hello', async (request, reply) => {
+    return 'Yo pjo'
 })
 
 server.listen({ port: 3000, host: '0.0.0.0'}, (err, address) => {
