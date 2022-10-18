@@ -1,11 +1,7 @@
 import fastify from 'fastify'
-
-const fastifyCORS = require("@fastify/cors");
-
 const server = fastify()
 
-// interface for re
-// quest object
+// interface for requst parameters
 /**
  * Define interface for title, materialType parameters
  */
@@ -22,6 +18,13 @@ server.get<{
     Querystring: IDefaultQuerystring,
     Headers: IHeaders
 }>('/defaultcover', async (request, reply) => {
+    //@TODO prevalidation .. like:
+    /*
+    preValidation: (request, reply, done) => {
+    const { username, password } = request.query
+    done(username !== 'admin' ? new Error('Must be admin') : undefined) // only validate `admin` account
+  }
+     */
     const { title, materialType } = request.query
     const customerHeader = request.headers['h-Custom']
     // do something with request data
