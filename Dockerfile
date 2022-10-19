@@ -17,7 +17,9 @@ RUN npm set progress=false && npm config set depth 0 && \
 
 # ---- Release ----
 FROM $NODE_BASEIMAGE AS release
+RUN apt-get update && apt-get install fontconfig -y
 WORKDIR /home/node/app
 COPY --chown=node:node --from=build /home/node/app/ ./
 
+USER node
 CMD ["npm", "start"]
