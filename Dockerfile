@@ -8,7 +8,7 @@ WORKDIR /home/node/app
 
 USER node
 # copy project file
-COPY . .
+COPY --chown=node:node . .
 
 # install node packages
 RUN npm set progress=false && npm config set depth 0 && \
@@ -18,5 +18,5 @@ RUN npm set progress=false && npm config set depth 0 && \
 FROM $NODE_BASEIMAGE AS release
 WORKDIR /home/node/app
 COPY --chown=node:node --from=build /home/node/app/ ./
-USER node
+
 CMD ["npm", "start"]
