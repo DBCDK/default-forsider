@@ -45,7 +45,7 @@ function replaceInSvg(svg: string, title: string): string {
  * helper function to read the (svg) file.
  * @returns {Promise<string>} | String
  */
-async function read() {
+async function read():Promise<string> {
     try {
         return await Fs.readFile("images/template.svg", {encoding: "utf8"});
     } catch (e) {

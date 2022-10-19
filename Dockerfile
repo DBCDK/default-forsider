@@ -6,6 +6,7 @@ FROM  $NODE_BASEIMAGE AS build
 # set working directory
 WORKDIR /home/node/app
 
+USER node
 # copy project file
 COPY . .
 
