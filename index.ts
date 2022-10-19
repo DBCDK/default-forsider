@@ -1,4 +1,5 @@
 import fastify from 'fastify'
+import {generate} from "./svg/svgGenerator";
 const server = fastify()
 
 // interface for requst parameters
@@ -28,6 +29,8 @@ server.get<{
     const { title, materialType } = request.query
     const customerHeader = request.headers['h-Custom']
     // do something with request data
+    const generated = generate(title);
+    return generated;
 
     return `get me ${title} and ${materialType}!`
 })
