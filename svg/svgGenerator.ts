@@ -5,7 +5,7 @@ export async function generate(title: string): Promise<string> {
     return replaceInSvg(svgAsString, title);
 }
 
-function replaceInSvg(svg:string, title: string): string {
+function replaceInSvg(svg: string, title: string): string {
     return svg.replace("TITLE_TEMPLATE", title);
 }
 
