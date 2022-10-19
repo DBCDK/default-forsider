@@ -18,6 +18,5 @@ RUN npm set progress=false && npm config set depth 0 && \
 FROM $NODE_BASEIMAGE AS release
 WORKDIR /home/node/app
 COPY --chown=node:node --from=build /home/node/app/ ./
-RUN mkdir "/home/node/app/images"
 
 CMD ["npm", "start"]
