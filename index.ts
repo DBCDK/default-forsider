@@ -1,5 +1,5 @@
 import fastify from 'fastify'
-import {generate} from "./svg/svgGenerator";
+import {generate, svg2Image} from "./svg/svgGenerator";
 
 const server = fastify()
 
@@ -21,20 +21,10 @@ server.get<{
     Querystring: IDefaultQuerystring,
     Headers: IHeaders
 }>('/defaultcover', async (request, reply) => {
-    //@TODO prevalidation .. like:
-    /*
-    preValidation: (request, reply, done) => {
-    const { username, password } = request.query
-    done(username !== 'admin' ? new Error('Must be admin') : undefined) // only validate `admin` account
-  }
-     */
     const {title, materialType} = request.query
     const customerHeader = request.headers['h-Custom']
     // do something with request data
-    const generated = generate(title);
-    return generated;
-
-    return `get me ${title} and ${materialType}!`
+    return generate(title, materialType)
 })
 
 
