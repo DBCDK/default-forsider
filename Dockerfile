@@ -2,6 +2,7 @@ ARG NODE_BASEIMAGE=docker-dbc.artifacts.dbccloud.dk/dbc-node:latest
 
 # ---- Base Node ----
 FROM  $NODE_BASEIMAGE AS build
+RUN apt update && apt install fontconfig -y
 
 # set working directory
 WORKDIR /home/node/app
