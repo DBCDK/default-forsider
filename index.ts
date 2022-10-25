@@ -1,33 +1,74 @@
 import fastify from 'fastify'
-import {generate, svg2Image} from "./svg/svgGenerator";
+import {generate} from "./svg/svgGenerator";
+import path from "path";
+import {materialTypes, sizes} from "./utils";
+import {IFormats} from "./utils";
 
+const _ = require("lodash")
 const server = fastify()
 
-// interface for requst parameters
+// public folder for (static) images
+server.register(require('@fastify/static'), {
+    root: path.join(__dirname, 'images'),
+})
+
+interface IRequestStatus {
+    status: boolean,
+    message: string
+}
+
+
+// only validates materialtype for now -- TODO more validation
+function checkRequest(query:IDefaultQuerystring): IRequestStatus {
+    const {title, materialType} = query
+    const requestStatus = {status: true, message: "all good"};
+
+    // all params in query must be set
+    if ( !title || !materialType ){
+        return {status:false, message:"ALL parameters ( title, materialType) must be set in query"}
+    }
+
+    // check materialtype
+    const ucType = _.upperFirst(materialType);
+    let found = Object.keys(materialTypes).indexOf(ucType);
+    requestStatus.status = found !== -1;
+    if(!requestStatus.status){
+        requestStatus.message = "not supported materialType:" + materialType
+        return requestStatus
+    }
+    return requestStatus;
+}
+
+
 /**
  * Define interface for title, materialType parameters
  */
-interface IDefaultQuerystring {
-    title: string;
-    materialType: string;
+export interface IDefaultQuerystring {
+    title: string
+    materialType:materialTypes
 }
 
 interface IHeaders {
     'h-Custom': string;
 }
 
+
 // Typed endpoint - defaultcover
 server.get<{
     Querystring: IDefaultQuerystring,
     Headers: IHeaders
-}>('/defaultcover', async (request, reply) => {
-    const {title, materialType} = request.query
+}>('/defaultcover', {
+    preValidation: (request, reply, done) => {
+        const requestStatus = checkRequest(request.query)
+        done(!requestStatus.status ? new Error(requestStatus.message) : undefined)
+    }
+}, async (request, reply) => {
     const customerHeader = request.headers['h-Custom']
-    // do something with request data
-    return generate(title, materialType)
+    return generate(request.query)
 })
 
 
+// ping/pong
 server.get('/ping', async (request, reply) => {
     return 'pong\n'
 })
