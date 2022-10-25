@@ -21,8 +21,11 @@
   "homepage": "https://github.com/DBCDK/default-forsider#readme",
   "dependencies": {
     "@fastify/cors": "^8.1.0",
+    "@fastify/static": "^6.5.0",
     "fastify": "^4.8.1",
-    "sharp": "^0.31.1"
+    "lodash": "^4.17.21",
+    "sharp": "^0.31.1",
+    "uuid-by-string": "^4.0.0"
   },
   "devDependencies": {
     "@types/node": "^18.8.5",
