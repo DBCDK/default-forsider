@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="container" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 460">
+    <svg id="content" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 230" overflow="hidden" >
+        <rect width="125%" height="100%" fill="#CBF1EE" x="-15%" />
+        <rect x="49.04" y="32.7" width="2" height="30.59" transform="translate(-6.84 87.65) rotate(-78.69)"/>
+        <rect x="49.04" y="49.37" width="2" height="30.59" transform="translate(-23.19 101.05) rotate(-78.69)"/>
+        <rect x="49.04" y="66.04" width="2" height="30.59" transform="translate(-39.53 114.45) rotate(-78.69)"/>
+        <rect x="49.04" y="82.7" width="2" height="30.59" transform="translate(-55.87 127.85) rotate(-78.69)"/>
+        <rect x="84.74" y="47" width="30.59" height="2" transform="translate(-7.48 20.57) rotate(-11.32)"/>
+        <rect x="84.74" y="63.67" width="30.59" height="2" transform="translate(-10.75 20.9) rotate(-11.32)"/>
+        <rect x="84.74" y="80.33" width="30.59" height="2" transform="translate(-14.02 21.22) rotate(-11.32)"/>
+        <rect x="84.74" y="97" width="30.59" height="2" transform="translate(-17.29 21.54) rotate(-11.32)"/>
+        <path d="M126,34v-10.22l-50.98,10.2L24.04,23.78v10.22H15l.04,87h119.93l.04-87h-9Zm-49.96,1.81l47.96-9.59V109.18l-47.96,9.59V35.81ZM26.04,26.22l47.96,9.59V118.77l-47.96-9.59V26.22Zm-9.04,9.78h7.04V110.82l40.95,8.18H17.04l-.04-83Zm115.96,83h-47.94l40.98-8.18V36h7l-.04,83Z"/>
+        <text id="title" x="50%" y="70%" dominant-baseline="middle" text-anchor="middle" fill="#000000" font-family="Arial, Helvetica, sans-serif" font-size="0.9em">
+            TITLE_TEMPLATE
+        </text>
+    </svg>
+</svg>
