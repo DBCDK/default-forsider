@@ -16,7 +16,7 @@
         <path d="M26.5,26.5V123.5H123.5V26.5H26.5Zm2,2h45.5v45.5H28.5V28.5Zm45.5,93H28.5v-45.5h45.5v45.5Zm47.5,0h-45.5v-45.5h45.5v45.5Zm-45.5-47.5V28.5h45.5v45.5h-45.5Z"/>
         <path d="M98.75,45.5c-3.17,0-5.75,2.58-5.75,5.75s2.58,5.75,5.75,5.75,5.75-2.58,5.75-5.75-2.58-5.75-5.75-5.75Zm0,9.5c-2.07,0-3.75-1.68-3.75-3.75s1.68-3.75,3.75-3.75,3.75,1.68,3.75,3.75-1.68,3.75-3.75,3.75Z"/>
 
-        <text id="title" x="50%" y="70%" dominant-baseline="middle" text-anchor="middle" fill="#000000">
+        <text id="title" x="50%" y="70%" dominant-baseline="middle" text-anchor="middle" fill="#000000" font-family="Arial, Helvetica, sans-serif" font-size="0.9em">
             TITLE_TEMPLATE
         </text>
     </svg>
