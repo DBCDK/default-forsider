@@ -90,18 +90,19 @@ function replaceInSvg(svg: string, title: string): string {
 
 /**
  * Attempt to split a long title...
- *     // NOTE .. approximately 24 characters / line ..
  *
  * @param longTitle
  */
 function splitString(longTitle: string): Array<string> {
     const parts = longTitle.split(' ');
     const arrayToReturn: Array<string> = [];
+    // maxLength of óne line of text in svg
+    const maxLength: number = 22;
 
     let line: string = "";
     let globalIndex = 0;
     parts.forEach((part, index) => {
-        if (line.length + part.length > 23) {
+        if (line.length + part.length > maxLength) {
             arrayToReturn.push(line)
             line = "";
             globalIndex = index;
