@@ -1,5 +1,5 @@
 import fastify from 'fastify'
-import {generate} from "./svg/svgGenerator";
+import {generate, generateArray} from "./svg/svgGenerator";
 import path from "path";
 import {materialTypes, sizes} from "./utils";
 import {IFormats} from "./utils";
@@ -19,7 +19,7 @@ interface IRequestStatus {
 
 
 // only validates materialtype for now -- TODO more validation
-function checkRequest(query:IDefaultQuerystring): IRequestStatus {
+function checkRequest(query:ICovers): IRequestStatus {
     const {title, materialType} = query
     const requestStatus = {status: true, message: "all good"};
 
@@ -43,7 +43,7 @@ function checkRequest(query:IDefaultQuerystring): IRequestStatus {
 /**
  * Define interface for title, materialType parameters
  */
-export interface IDefaultQuerystring {
+export interface ICovers {
     title: string
     materialType:materialTypes
 }
@@ -55,7 +55,7 @@ interface IHeaders {
 
 // Typed endpoint - defaultcover
 server.get<{
-    Querystring: IDefaultQuerystring,
+    Querystring: ICovers,
     Headers: IHeaders
 }>('/defaultcover', {
     preValidation: (request, reply, done) => {
@@ -66,6 +66,18 @@ server.get<{
     const customerHeader = request.headers['h-Custom']
     return generate(request.query)
 })
+
+export interface ICoversArray{
+    coverParams:Array<ICovers>
+}
+// typed endpoint - POST
+server.post<{
+    Headers: IHeaders;
+    Body: ICoversArray;
+}>('/defaultcover/',  (request, reply) => {
+    const fisk = generateArray(request.body);
+    reply.code(200).send({ response: fisk });
+});
 
 
 // ping/pong

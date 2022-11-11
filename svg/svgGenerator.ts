@@ -1,26 +1,41 @@
 import {promises as Fs} from "fs";
 
 import {colors, materialTypes, sizes} from "../utils";
-import {IDefaultQuerystring} from "../index";
+import {ICovers, ICoversArray} from "../index";
 
 const _ = require("lodash")
 
 /**
+ * Entry function for GET request.
  * Generate a file. Return uid of file. Let graphql api handle url generation.
  * @param query
  */
-export async function generate(query: IDefaultQuerystring): Promise<string> {
+export function generate(query: ICovers): string {
     const {title, materialType} = query
     // we need to generate same hash each time - use 'uuid-by-string' @see https://www.npmjs.com/package/uuid-by-string
     const getUuid = require('uuid-by-string');
     const uuidHash = getUuid(`${title}${materialType}`);
-    let svgAsString = await read(materialType);
-    const buf = Buffer.from(replaceInSvg(svgAsString, title));
-    Object.keys(sizes).forEach((size) => {
-        const imagePath = pathToImage(uuidHash, size);
-        svg2Image(buf, imagePath, size);
-    })
-    return generateUrl(uuidHash);
+    read(materialType).then((svgAsString) => {
+        const buf = Buffer.from(replaceInSvg(svgAsString, title));
+        Object.keys(sizes).forEach((size) => {
+            const imagePath = pathToImage(uuidHash, size);
+            svg2Image(buf, imagePath, size);
+        })
+    });
+
+    return uuidHash;
+}
+
+/**
+ * Entry function for POST request.
+ * Handle an array of Covers (ICovers). Return an array of uuid's generated.
+ * @param payLoad
+ */
+export function generateArray(payLoad: ICoversArray): Array<string> {
+    const {coverParams} = payLoad;
+    const returnValues: Array<string> = [];
+    coverParams.forEach((cover) => returnValues.push(generate(cover)));
+    return returnValues;
 }
 
 /**
@@ -56,13 +71,6 @@ function pathToImage(uuidHash: string, size: string): string {
 }
 
 /**
- * Return unique id of to the image generated.
- */
-function generateUrl(path = "", filename = ""): string {
-    return path;
-}
-
-/**
  * Get a random color from colors enum.
  */
 function randomColor(): string {
@@ -84,7 +92,7 @@ function replaceInSvg(svg: string, title: string): string {
     // split string if it is to long
     const lines = splitString(title);
     // insert each part of string in <tspan> element
-    const svgTitle = lines.map((line)=>'<tspan x="50%" dy="1.2em">' + line + '</tspan>').join(' ');
+    const svgTitle = lines.map((line) => '<tspan x="50%" dy="1.2em">' + line + '</tspan>').join(' ');
     return svg.replace("TITLE_TEMPLATE", svgTitle).replace("COLOR_TEMPLATE", svgColor);
 }
 
@@ -93,7 +101,7 @@ function replaceInSvg(svg: string, title: string): string {
  *
  * @param longTitle
  */
-function splitString(longTitle: string): Array<string> {
+export function splitString(longTitle: string): Array<string> {
     const parts = longTitle.split(' ');
     const arrayToReturn: Array<string> = [];
     // maxLength of óne line of text in svg
@@ -101,6 +109,7 @@ function splitString(longTitle: string): Array<string> {
 
     let line: string = "";
     let globalIndex = 0;
+    // split title in array of lines with maxlength
     parts.forEach((part, index) => {
         if (line.length + part.length > maxLength) {
             arrayToReturn.push(line)
@@ -121,8 +130,10 @@ function splitString(longTitle: string): Array<string> {
  */
 async function read(materialType: string): Promise<string> {
     try {
+        // get materialtype value from materialTypes enum
         const index: number = Object.keys(materialTypes).indexOf(_.upperFirst(materialType));
         const matType = Object.values(materialTypes)[index];
+        // read the template
         return await Fs.readFile(`templates/${matType}.svg`, {encoding: "utf8"});
     } catch (e) {
         console.log(`Read  failed:`, {
