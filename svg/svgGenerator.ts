@@ -98,30 +98,27 @@ function replaceInSvg(svg: string, title: string): string {
 
 /**
  * Attempt to split a long title...
+ * TODO -- a better split string function - it looks horrible
  *
  * @param longTitle
  */
 export function splitString(longTitle: string): Array<string> {
     const parts = longTitle.split(' ');
-    const arrayToReturn: Array<string> = [];
-    // maxLength of óne line of text in svg
-    const maxLength: number = 22;
+    let arrayToReturn: Array<string> = [];
 
-    let line: string = "";
-    let globalIndex = 0;
-    // split title in array of lines with maxlength
-    parts.forEach((part, index) => {
-        if (line.length + part.length > maxLength) {
-            arrayToReturn.push(line)
-            line = "";
-            globalIndex = index;
-        }
-        line += ' ' + part;
-    })
-    // the rest of the text
-    arrayToReturn.push(parts.splice(globalIndex).join(' '));
+    // from google
+    arrayToReturn = arrayToReturn.concat.apply([],
+        longTitle.split('').map(function (title, index) {
+            return index % 21 ? [] : longTitle.slice(index, index + 21) + '-'
+        })
+    )
 
-    return arrayToReturn.length > 0 ? arrayToReturn : [longTitle];
+    // sanitize the array
+    // remove last '-' in array
+    const index = arrayToReturn.length - 1;
+    arrayToReturn[index] = arrayToReturn[index].slice(0, -1)
+
+    return arrayToReturn;
 }
 
 /**
