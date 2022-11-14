@@ -1,4 +1,5 @@
 import {promises as Fs} from "fs";
+import {existsSync} from 'fs';
 
 import {colors, materialTypes, sizes} from "../utils";
 import {ICovers, ICoversArray} from "../index";
@@ -14,16 +15,31 @@ export function generate(query: ICovers): string {
     const {title, materialType} = query
     // we need to generate same hash each time - use 'uuid-by-string' @see https://www.npmjs.com/package/uuid-by-string
     const getUuid = require('uuid-by-string');
-    const uuidHash = getUuid(`${title}${materialType}`);
-    read(materialType).then((svgAsString) => {
-        const buf = Buffer.from(replaceInSvg(svgAsString, title));
-        Object.keys(sizes).forEach((size) => {
-            const imagePath = pathToImage(uuidHash, size);
-            svg2Image(buf, imagePath, size);
-        })
-    });
 
+    const uuidHash = getUuid(`${title}${materialType}`);
+    if(!doesFileExist(uuidHash)) {
+        read(materialType).then((svgAsString) => {
+            const buf = Buffer.from(replaceInSvg(svgAsString, title));
+            Object.keys(sizes).forEach((size) => {
+                const imagePath = pathToImage(uuidHash, size);
+                svg2Image(buf, imagePath, size);
+            })
+        });
+    }
     return uuidHash;
+}
+
+/**
+ * Check if file with given uuid exists already.
+ * @param uuid
+ */
+function doesFileExist(uuid: string): boolean {
+    const pathToFile = pathToImage(uuid, "large") + ".jpg";
+    if (existsSync(pathToFile)) {
+        return true;
+    } else {
+        return false;
+    }
 }
 
 /**
