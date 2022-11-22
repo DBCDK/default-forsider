@@ -19,20 +19,20 @@ interface IRequestStatus {
 
 
 // only validates materialtype for now -- TODO more validation
-function checkRequest(query:ICovers): IRequestStatus {
+export function checkRequest(query: ICovers): IRequestStatus {
     const {title, materialType} = query
     const requestStatus = {status: true, message: "all good"};
 
     // all params in query must be set
-    if ( !title || !materialType ){
-        return {status:false, message:"ALL parameters ( title, materialType) must be set in query"}
+    if (!title || !materialType) {
+        return {status: false, message: "ALL parameters ( title, materialType) must be set in query"}
     }
 
     // check materialtype
     const ucType = _.upperFirst(materialType);
     let found = Object.keys(materialTypes).indexOf(ucType);
     requestStatus.status = found !== -1;
-    if(!requestStatus.status){
+    if (!requestStatus.status) {
         requestStatus.message = "not supported materialType:" + materialType
         return requestStatus
     }
@@ -45,7 +45,7 @@ function checkRequest(query:ICovers): IRequestStatus {
  */
 export interface ICovers {
     title: string
-    materialType:materialTypes
+    materialType: materialTypes
 }
 
 interface IHeaders {
@@ -64,19 +64,21 @@ server.get<{
     }
 }, async (request, reply) => {
     const customerHeader = request.headers['h-Custom']
-    return generate(request.query)
+    const response = generate(request.query)
+    reply.code(200).send({response: [response]});
 })
 
-export interface ICoversArray{
-    coverParams:Array<ICovers>
+export interface ICoversArray {
+    coverParams: Array<ICovers>
 }
+
 // typed endpoint - POST
 server.post<{
     Headers: IHeaders;
     Body: ICoversArray;
-}>('/defaultcover/',  (request, reply) => {
+}>('/defaultcover/', (request, reply) => {
     const fisk = generateArray(request.body);
-    reply.code(200).send({ response: fisk });
+    reply.code(200).send({response: fisk});
 });
 
 
@@ -95,7 +97,7 @@ server.get('/hello', async (request, reply) => {
     return 'Yo pjo'
 })
 
-server.listen({port: 3000, host: '0.0.0.0'}, (err, address) => {
+server.listen({port: 4000, host: '0.0.0.0'}, (err, address) => {
     if (err) {
         console.error(err)
         process.exit(1)

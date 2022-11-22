@@ -1,7 +1,7 @@
 export enum materialTypes {
   Bog = "BOG", /*Dækker også varianter for Billedbog, Tegneserie, Graphic novel, Stor skrift*/
   Lydbog = "LYDBOG", /*Dækker også alle fysiske varianter (eksempelvis: CD, mp3, bånd) også Lydbog (net)*/
-  "E-bog" = "EBOG",
+  "Ebog" = "EBOG",
   Tidsskrift = "TIDSSKRIFT", /* Benyttes også for Avis, Magasin, Årbog*/
   Artikel = "ARTIKEL", /*Benyttes også for Avisartikel, Anmeldelse*/
   Podcast = "PODCAST",
@@ -12,6 +12,7 @@ export enum materialTypes {
   Computerspil = "COMPUTERSPIL", /* Dækker alle varianter (eksempelvis PC-spil, Gameboy, Playstation, Nintendo, Xbox, Wii) */
   Brætspil = "BRÆTSPIL"
 }
+
 
 export enum colors {
   BBE2EE = "#BBE2EE",

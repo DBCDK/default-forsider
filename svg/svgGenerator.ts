@@ -1,24 +1,41 @@
-import {promises as Fs} from "fs";
+import {promises as Fs, stat} from "fs";
 import {existsSync} from 'fs';
 
 import {colors, materialTypes, sizes} from "../utils";
-import {ICovers, ICoversArray} from "../index";
+import {ICovers, ICoversArray, checkRequest} from "../index";
 
 const _ = require("lodash")
+
+interface IReturnCover{
+    error?:string,
+    thumbNail?:string,
+    detail?:string;
+}
 
 /**
  * Entry function for GET request.
  * Generate a file. Return uid of file. Let graphql api handle url generation.
  * @param query
  */
-export function generate(query: ICovers): string {
+export function generate(query: ICovers): IReturnCover {
     const {title, materialType} = query
     // we need to generate same hash each time - use 'uuid-by-string' @see https://www.npmjs.com/package/uuid-by-string
     const getUuid = require('uuid-by-string');
 
+    const status = checkRequest(query);
+    if(!status.status){
+        console.log(status);
+        return {
+            error:status.message
+        }
+    }
+
+
     const uuidHash = getUuid(`${title}${materialType}`);
     if(!doesFileExist(uuidHash)) {
         read(materialType).then((svgAsString) => {
+            // @TODO check string - it might be empty
+
             const buf = Buffer.from(replaceInSvg(svgAsString, title));
             Object.keys(sizes).forEach((size) => {
                 const imagePath = pathToImage(uuidHash, size);
@@ -26,7 +43,12 @@ export function generate(query: ICovers): string {
             })
         });
     }
-    return uuidHash;
+
+    // @TODO return an object - like : {thumbNail:"thumbnail/uuidhash", detail:"large/uuidhash"}
+    return {
+        thumbNail:`thumbnail/${uuidHash}.jpg`,
+        detail: `large/${uuidHash}.jpg`
+    }
 }
 
 /**
@@ -35,11 +57,7 @@ export function generate(query: ICovers): string {
  */
 function doesFileExist(uuid: string): boolean {
     const pathToFile = pathToImage(uuid, "large") + ".jpg";
-    if (existsSync(pathToFile)) {
-        return true;
-    } else {
-        return false;
-    }
+    return existsSync(pathToFile);
 }
 
 /**
@@ -47,9 +65,9 @@ function doesFileExist(uuid: string): boolean {
  * Handle an array of Covers (ICovers). Return an array of uuid's generated.
  * @param payLoad
  */
-export function generateArray(payLoad: ICoversArray): Array<string> {
+export function generateArray(payLoad: ICoversArray): Array<IReturnCover> {
     const {coverParams} = payLoad;
-    const returnValues: Array<string> = [];
+    const returnValues: Array<IReturnCover> = [];
     coverParams.forEach((cover) => returnValues.push(generate(cover)));
     return returnValues;
 }
@@ -58,7 +76,6 @@ export function generateArray(payLoad: ICoversArray): Array<string> {
  * Generate an image from given parameters. Write file with given path and given format.
  * @param svgString
  * @param path
- * @param format -defaults to 'svg'
  * @param size
  */
 function svg2Image(svgString: Buffer, path: string, size: string): void {
