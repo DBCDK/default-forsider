@@ -1,7 +1,7 @@
 import fastify from 'fastify'
 import {generate, generateArray} from "./svg/svgGenerator";
 import path from "path";
-import {materialTypes, sizes} from "./utils";
+import {mapMaterialType, materialTypes, sizes} from "./utils";
 import {IFormats} from "./utils";
 
 const _ = require("lodash")
@@ -28,9 +28,9 @@ export function checkRequest(query: ICovers): IRequestStatus {
         return {status: false, message: "ALL parameters ( title, materialType) must be set in query"}
     }
 
+    const mappedMaterialType:string = mapMaterialType(materialType);
     // check materialtype
-    const ucType = _.upperFirst(materialType);
-    let found = Object.keys(materialTypes).indexOf(ucType);
+    let found = Object.keys(materialTypes).indexOf(mappedMaterialType);
     requestStatus.status = found !== -1;
     if (!requestStatus.status) {
         requestStatus.message = "not supported materialType:" + materialType
