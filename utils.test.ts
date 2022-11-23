@@ -21,3 +21,17 @@ test("map MaterialTypes",() => {
     const expected = "Lydbog"
     expect(actual).toEqual(expected);
 })
+
+test("map MaterialTypes",() => {
+    const matType = "fisk";
+    const actual = mapMaterialType(matType);
+    const expected = "Bog"
+    expect(actual).toEqual(expected);
+})
+
+test("map MaterialTypes",() => {
+    const matType = "årbog";
+    const actual = mapMaterialType(matType);
+    const expected = "Tidsskrift"
+    expect(actual).toEqual(expected);
+})
