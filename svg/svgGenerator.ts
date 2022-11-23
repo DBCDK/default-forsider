@@ -1,7 +1,7 @@
 import {promises as Fs, stat} from "fs";
 import {existsSync} from 'fs';
 
-import {colors, mapMaterialType, materialTypes, sizes} from "../utils";
+import {colors, encodeXmlSpecialChars, mapMaterialType, materialTypes, sizes} from "../utils";
 import {ICovers, ICoversArray, checkRequest} from "../index";
 
 const _ = require("lodash")
@@ -128,8 +128,9 @@ function replaceInSvg(svg: string, title: string): string {
     // split string if it is to long
     const lines = splitString(title);
     // insert each part of string in <tspan> element
-    const svgTitle = lines.map((line) => '<tspan x="50%" dy="1.2em">' + line + '</tspan>').join(' ');
-    return svg.replace("TITLE_TEMPLATE", svgTitle).replace("COLOR_TEMPLATE", svgColor).replace(/&/g, '&amp;');
+    const svgTitle = lines.map((line) => '<tspan x="50%" dy="1.2em">' + encodeXmlSpecialChars(line) + '</tspan>').join(' ');
+    return svg.replace("TITLE_TEMPLATE", svgTitle).replace("COLOR_TEMPLATE", svgColor);
+
 }
 
 /**

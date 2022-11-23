@@ -65,6 +65,7 @@ const materialTypeMap = {
         "graphic novel",
     ] /*Dækker også varianter for Billedbog, Tegneserie, Graphic novel, Stor skrift*/,
     Lydbog: [
+        "lydbog",
         "lydbog (cd)",
         "lydbog (net)",
         "lydbog (bånd)",
