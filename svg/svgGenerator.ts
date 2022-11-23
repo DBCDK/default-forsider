@@ -1,7 +1,7 @@
 import {promises as Fs, stat} from "fs";
 import {existsSync} from 'fs';
 
-import {colors, materialTypes, sizes} from "../utils";
+import {colors, encodeXmlSpecialChars, mapMaterialType, materialTypes, sizes} from "../utils";
 import {ICovers, ICoversArray, checkRequest} from "../index";
 
 const _ = require("lodash")
@@ -19,6 +19,8 @@ interface IReturnCover{
  */
 export function generate(query: ICovers): IReturnCover {
     const {title, materialType} = query
+
+    const mappedMaterial:string = mapMaterialType(materialType);
     // we need to generate same hash each time - use 'uuid-by-string' @see https://www.npmjs.com/package/uuid-by-string
     const getUuid = require('uuid-by-string');
 
@@ -31,9 +33,9 @@ export function generate(query: ICovers): IReturnCover {
     }
 
 
-    const uuidHash = getUuid(`${title}${materialType}`);
+    const uuidHash = getUuid(`${title}${mappedMaterial}`);
     if(!doesFileExist(uuidHash)) {
-        read(materialType).then((svgAsString) => {
+        read(mappedMaterial).then((svgAsString) => {
             // @TODO check string - it might be empty
 
             const buf = Buffer.from(replaceInSvg(svgAsString, title));
@@ -65,10 +67,10 @@ function doesFileExist(uuid: string): boolean {
  * Handle an array of Covers (ICovers). Return an array of uuid's generated.
  * @param payLoad
  */
-export function generateArray(payLoad: ICoversArray): Array<IReturnCover> {
-    const {coverParams} = payLoad;
+export function generateArray(payLoad: any): Array<IReturnCover> {
+    const coverParams = payLoad;
     const returnValues: Array<IReturnCover> = [];
-    coverParams.forEach((cover) => returnValues.push(generate(cover)));
+    payLoad.forEach((cover:ICovers) => returnValues.push(generate(cover)));
     return returnValues;
 }
 
@@ -88,6 +90,7 @@ function svg2Image(svgString: Buffer, path: string, size: string): void {
             height: sizes.height,
         })
         .toFile(`${path}.jpg`, (err: any, info: any) => {
+            console.log(svgString, "SVG")
             console.log(err, "ERROR")
             console.log(info, "INFO")
         });
@@ -125,8 +128,9 @@ function replaceInSvg(svg: string, title: string): string {
     // split string if it is to long
     const lines = splitString(title);
     // insert each part of string in <tspan> element
-    const svgTitle = lines.map((line) => '<tspan x="50%" dy="1.2em">' + line + '</tspan>').join(' ');
+    const svgTitle = lines.map((line) => '<tspan x="50%" dy="1.2em">' + encodeXmlSpecialChars(line) + '</tspan>').join(' ');
     return svg.replace("TITLE_TEMPLATE", svgTitle).replace("COLOR_TEMPLATE", svgColor);
+
 }
 
 /**

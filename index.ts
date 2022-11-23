@@ -1,152 +1,152 @@
 import fastify from "fastify";
-import { generate, generateArray } from "./svg/svgGenerator";
+import {generate, generateArray} from "./svg/svgGenerator";
 import path from "path";
-import { materialTypes, sizes } from "./utils";
-import { IFormats } from "./utils";
-import { promises as Fs } from "fs";
+import {promises as Fs} from "fs";
+import {mapMaterialType, materialTypes, sizes} from "./utils";
 
 const _ = require("lodash");
 const server = fastify();
 
 // public folder for (static) images
 server.register(require("@fastify/static"), {
-  root: path.join(__dirname, "images"),
+    root: path.join(__dirname, "images"),
 });
 
 function delay(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 async function fileExists(path: string): Promise<boolean> {
-  try {
-    await Fs.access("./images" + path);
-    return true;
-  } catch (error) {
-    return false;
-  }
+    try {
+        await Fs.access("./images" + path);
+        return true;
+    } catch (error) {
+        return false;
+    }
 }
 
 async function waitForFile(path: string) {
-  const retryBackOff = [100, 500, 1000, 5000, 10000];
-  for (let i = 0; i < retryBackOff.length; i++) {
-    if (await fileExists(path)) {
-      // All good, file exists
-      return;
+    const retryBackOff = [100, 500, 1000, 5000, 10000];
+    for (let i = 0; i < retryBackOff.length; i++) {
+        if (await fileExists(path)) {
+            // All good, file exists
+            return;
+        }
+
+        // Not ready yet, wait some time
+        // console.log("not found wait for file ", retryBackOff[i])
+        await delay(retryBackOff[i]);
     }
 
-    // Not ready yet, wait some time
-    // console.log("not found wait for file ", retryBackOff[i])
-    await delay(retryBackOff[i]);
-  }
-
-  // Uhoh, this is not good, image was not generated, we should monitor this
-  // TODO monitor this
+    // Uhoh, this is not good, image was not generated, we should monitor this
+    // TODO monitor this
 }
 
 server.addHook("onRequest", async (request, reply) => {
-  // We should have a better way of identifying file access
-  if (
-    request.url.startsWith("/large") ||
-    request.url.startsWith("/thumbnail")
-  ) {
-    await waitForFile(request.url);
-  }
+    // We should have a better way of identifying file access
+    if (
+        request.url.startsWith("/large") ||
+        request.url.startsWith("/thumbnail")
+    ) {
+        await waitForFile(request.url);
+    }
 });
 
 interface IRequestStatus {
-  status: boolean;
-  message: string;
+    status: boolean;
+    message: string;
 }
 
 // only validates materialtype for now -- TODO more validation
 export function checkRequest(query: ICovers): IRequestStatus {
-  const { title, materialType } = query;
-  const requestStatus = { status: true, message: "all good" };
+    const {title, materialType} = query;
+    const requestStatus = {status: true, message: "all good"};
 
-  // all params in query must be set
-  if (!title || !materialType) {
-    return {
-      status: false,
-      message: "ALL parameters ( title, materialType) must be set in query",
-    };
-  }
+    // all params in query must be set
+    if (!title || !materialType) {
+        return {
+            status: false,
+            message: "ALL parameters ( title, materialType) must be set in query",
+        };
+    }
 
-  // check materialtype
-  const ucType = _.upperFirst(materialType);
-  let found = Object.keys(materialTypes).indexOf(ucType);
-  requestStatus.status = found !== -1;
-  if (!requestStatus.status) {
-    requestStatus.message = "not supported materialType:" + materialType;
+    const mappedMaterialType: string = mapMaterialType(materialType);
+    // check materialtype
+    let found = Object.keys(materialTypes).indexOf(mappedMaterialType);
+    requestStatus.status = found !== -1;
+    if (!requestStatus.status) {
+        requestStatus.message = "not supported materialType:" + materialType
+        return requestStatus
+    }
     return requestStatus;
-  }
-  return requestStatus;
 }
+
 
 /**
  * Define interface for title, materialType parameters
  */
 export interface ICovers {
-  title: string;
-  materialType: materialTypes;
+    title: string;
+    materialType: materialTypes;
 }
 
 interface IHeaders {
-  "h-Custom": string;
+    "h-Custom": string;
 }
 
 // Typed endpoint - defaultcover
 server.get<{
-  Querystring: ICovers;
-  Headers: IHeaders;
+    Querystring: ICovers;
+    Headers: IHeaders;
 }>(
-  "/defaultcover",
-  {
-    preValidation: (request, reply, done) => {
-      const requestStatus = checkRequest(request.query);
-      done(
-        !requestStatus.status ? new Error(requestStatus.message) : undefined
-      );
+    "/defaultcover",
+    {
+        preValidation: (request, reply, done) => {
+            const requestStatus = checkRequest(request.query);
+            done(
+                !requestStatus.status ? new Error(requestStatus.message) : undefined
+            );
+        },
     },
-  },
-  async (request, reply) => {
-    const customerHeader = request.headers["h-Custom"];
-    const response = generate(request.query);
-    reply.code(200).send({ response: [response] });
-  }
+    async (request, reply) => {
+        const customerHeader = request.headers["h-Custom"];
+        const response = generate(request.query);
+        reply.code(200).send({response: [response]});
+    }
 );
 
 export interface ICoversArray {
-  coverParams: Array<ICovers>;
+    coverParams: Array<ICovers>;
 }
 
 // typed endpoint - POST
 server.post<{
-  Headers: IHeaders;
-  Body: ICoversArray;
+    Headers: IHeaders;
+    Body: ICoversArray;
 }>("/defaultcover/", (request, reply) => {
-  const fisk = generateArray(request.body);
-  reply.code(200).send({ response: fisk });
+    const fisk = generateArray(request.body);
+    reply.code(200).send({response: fisk});
 });
 
 // ping/pong
 server.get("/ping", async (request, reply) => {
-  return "pong\n";
+    return "pong\n";
 });
 
 // for liveliness probe
 server.get("/", async (request, reply) => {
-  return "ok";
+    return "ok";
 });
 
 // for yo
 server.get("/hello", async (request, reply) => {
-  return "Yo pjo";
+    return "Yo pjo";
 });
 
-server.listen({ port: 4000, host: "0.0.0.0" }, (err, address) => {
-  if (err) {
-    console.error(err);
-    process.exit(1);
-  }
-  console.log(`Server listening at ${address}`);
+server.listen({port: 4000, host: "0.0.0.0"}, (err, address) => {
+    if (err) {
+        console.error(err);
+        process.exit(1);
+    }
+    console.log(`Server listening at ${address}`);
 });
