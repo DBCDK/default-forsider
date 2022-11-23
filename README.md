@@ -9,5 +9,8 @@ This project was bootstrapped with Fastify-CLI.
 fastify will be listening on localhost:3000
 
 # Endpoints for now 
-/ displays HEY PJO - other endpoints later
+ - GET / displays HEY PJO - other endpoints later
+ - DELETE /wipeAll deletes all generated images
+
+
 
