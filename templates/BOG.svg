@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg id="container" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 460">
     <svg id="content" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 230" overflow="hidden" >
-        <rect width="125%" height="100%" fill="#CBF1EE" x="-15%" />
+        <rect width="100%" height="100%" fill="COLOR_TEMPLATE"/>
         <rect x="49.04" y="32.7" width="2" height="30.59" transform="translate(-6.84 87.65) rotate(-78.69)"/>
         <rect x="49.04" y="49.37" width="2" height="30.59" transform="translate(-23.19 101.05) rotate(-78.69)"/>
         <rect x="49.04" y="66.04" width="2" height="30.59" transform="translate(-39.53 114.45) rotate(-78.69)"/>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg id="container" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 460">
     <svg id="content" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 230" overflow="hidden">
-        <rect width="100%" height="100%" fill="white"/>
+        <rect width="100%" height="100%" fill="COLOR_TEMPLATE"/>
         <path d="M116,130.76H31.35V19.25H116v111.51Zm-82.65-2H114V21.25H33.35v107.51Z"/>
         <path d="M69.99,66.25h-25.07V34.25h25.07v32Zm-23.07-2h21.07v-28h-21.07v28Z"/>
         <rect x="80" y="64.25" width="25" height="2"/>
