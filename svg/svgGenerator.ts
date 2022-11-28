@@ -99,10 +99,7 @@ function svg2Image(svgString: Buffer, path: string, size: string): void {
   const timestamp = performance.now();
   sharp(svgString)
     .resize(sizes)
-    .jpeg({
-      width: sizes.width,
-      height: sizes.height,
-    })
+    .jpeg()
     .toFile(`${path}.jpg`, (err: any, info: any) => {
       const total_ms = performance.now() - timestamp;
       registerDuration(PERFORMANCE_HISTOGRAM_NAME, total_ms);
