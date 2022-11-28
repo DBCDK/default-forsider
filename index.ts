@@ -78,10 +78,7 @@ async function waitForFile(path: string) {
 
 server.addHook("onRequest", async (request, reply) => {
   // We should have a better way of identifying file access
-  if (
-    request.url.startsWith("/large") ||
-    request.url.startsWith("/thumbnail")
-  ) {
+  if (request.url.includes("/large") || request.url.includes("/thumbnail")) {
     const now = performance.now();
     await waitForFile(request.url);
     registerDuration(PERFORMANCE_WAIT_FOR_IMAGE, performance.now() - now);
