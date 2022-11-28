@@ -13,7 +13,9 @@ const server = fastify();
 
 export const workingDirectory = process.env.IMAGE_DIR || "FISK/";
 
-// check if folders are ready
+/**
+ * Check if working directories for storing images are in place
+ */
 async function checkDirectories() {
   const good = await fileExists(`/${workingDirectory}`);
   if (!good) {
@@ -22,6 +24,12 @@ async function checkDirectories() {
     await Fs.mkdir(`images/${workingDirectory}thumbnail`);
   }
 }
+
+/**
+ * Cleanup - if working directory has changed, we cleanup (delete images) in
+ * old working directories
+ */
+function cleanup() {}
 
 checkDirectories();
 // public folder for (static) images

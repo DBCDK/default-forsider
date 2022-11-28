@@ -10,7 +10,7 @@
 <path d="M197.804 140.818L161.81 148.023L162.281 150.377L198.275 143.171L197.804 140.818Z" fill="black"/>
 <path d="M211.2 68.8V56.536L150.024 68.776L88.848 56.536V68.8H78L78.048 173.2H221.964L222.012 68.8H211.212H211.2ZM151.248 70.972L208.8 59.464V159.016L151.248 170.524V70.972ZM91.248 59.464L148.8 70.972V170.524L91.248 159.016V59.464ZM80.4 71.2H88.848V160.984L137.988 170.8H80.448L80.4 71.2ZM219.552 170.8H162.024L211.2 160.984V71.2H219.6L219.552 170.8Z" fill="black"/>
 <line x1="125" y1="227" x2="175" y2="227" stroke="#212121" stroke-width="2"/>
-    <text id="title" x="50%" y="70%" dominant-baseline="middle" text-anchor="middle" fill="#000000"
+    <text id="title" x="50%" y="60%" dominant-baseline="middle" text-anchor="middle" fill="#000000"
           font-family="IBM Plex Sans Medium" font-size="2.5em" >
         TITLE_TEMPLATE
     </text>
