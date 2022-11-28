@@ -6,6 +6,7 @@ import { mapMaterialType, materialTypes, sizes } from "./utils";
 import { exec } from "child_process";
 // @ts-ignore
 import { log } from "dbc-node-logger";
+import { getMetrics, initHistogram, registerDuration } from "./monitor";
 
 const _ = require("lodash");
 const server = fastify();
@@ -27,6 +28,9 @@ checkDirectories();
 server.register(require("@fastify/static"), {
   root: path.join(__dirname, "images"),
 });
+
+const PERFORMANCE_WAIT_FOR_IMAGE = "wait_for_image";
+initHistogram(PERFORMANCE_WAIT_FOR_IMAGE);
 
 function deleteAllImages() {
   return new Promise((resolve) => {
@@ -78,7 +82,9 @@ server.addHook("onRequest", async (request, reply) => {
     request.url.startsWith("/large") ||
     request.url.startsWith("/thumbnail")
   ) {
+    const now = performance.now();
     await waitForFile(request.url);
+    registerDuration(PERFORMANCE_WAIT_FOR_IMAGE, performance.now() - now);
   }
 });
 
@@ -139,7 +145,6 @@ server.get<{
   },
   async (request, reply) => {
     const customerHeader = request.headers["h-Custom"];
-    console.log("hest");
     const response = generate(request.query);
     reply.code(200).send({ response: [response] });
   }
@@ -166,6 +171,55 @@ server.get("/ping", async (request, reply) => {
 // for liveliness probe
 server.get("/", async (request, reply) => {
   return "ok";
+});
+
+// Count of images that have taken over 5 s to generate
+let prevOver5Seconds = 0;
+// Count of images that have taken over 5 s to wait for
+let prevOver5SecondsWait = 0;
+server.get("/howru", async (request, reply) => {
+  const metrics = await getMetrics();
+
+  // All requests minus requests that take 5s or below
+  const over5Seconds =
+    metrics.image_generation["<= +Inf"] - metrics.image_generation["<= 5"];
+
+  const over5SecondsWait =
+    metrics[PERFORMANCE_WAIT_FOR_IMAGE]["<= +Inf"] -
+    metrics[PERFORMANCE_WAIT_FOR_IMAGE]["<= 5"];
+
+  const alerts = [
+    {
+      description:
+        "There are images that take over 5s to be generated, since last time howru was called",
+      alert: over5Seconds > prevOver5Seconds,
+      over5Seconds,
+      prevOver5Seconds,
+    },
+    {
+      description:
+        "Number of times it takes over 5s to fetch image since last time howru was called",
+      alert: over5SecondsWait > prevOver5SecondsWait,
+      over5SecondsWait,
+      prevOver5SecondsWait,
+    },
+  ];
+
+  prevOver5Seconds = over5Seconds;
+  prevOver5SecondsWait = over5SecondsWait;
+  const ok = !alerts.find((a) => !!a.alert);
+
+  const res = {
+    ok,
+    metrics,
+    alerts,
+  };
+
+  if (!ok) {
+    reply.statusCode = 500;
+    log.error("Howru failed", { howruRes: JSON.stringify(res) });
+  }
+  return res;
 });
 
 // for yo
