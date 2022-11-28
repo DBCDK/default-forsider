@@ -4,6 +4,7 @@ import path from "path";
 import { promises as Fs } from "fs";
 import { mapMaterialType, materialTypes, sizes } from "./utils";
 import { exec } from "child_process";
+// @ts-ignore
 import { log } from "dbc-node-logger";
 
 const _ = require("lodash");
@@ -13,11 +14,11 @@ export const workingDirectory = "FISK/";
 
 // check if folders are ready
 async function checkDirectories() {
-  const good = await fileExists(workingDirectory);
+  const good = await fileExists(`/${workingDirectory}`);
   if (!good) {
-    await Fs.mkdir(`images${workingDirectory}`);
-    await Fs.mkdir(`images${workingDirectory}/large`);
-    await Fs.mkdir(`images${workingDirectory}/thumbnail`);
+    await Fs.mkdir(`images/${workingDirectory}`);
+    await Fs.mkdir(`images/${workingDirectory}large`);
+    await Fs.mkdir(`images/${workingDirectory}thumbnail`);
   }
 }
 
