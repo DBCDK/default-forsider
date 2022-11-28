@@ -1,5 +1,6 @@
 import { promises as Fs, stat } from "fs";
 import { existsSync } from "fs";
+import { workingDirectory } from "../index";
 
 import {
   colors,
@@ -53,8 +54,8 @@ export function generate(query: ICovers): IReturnCover {
 
   // @TODO return an object - like : {thumbNail:"thumbnail/uuidhash", detail:"large/uuidhash"}
   return {
-    thumbNail: `thumbnail/${uuidHash}.jpg`,
-    detail: `large/${uuidHash}.jpg`,
+    thumbNail: `${workingDirectory}thumbnail/${uuidHash}.jpg`,
+    detail: `${workingDirectory}large/${uuidHash}.jpg`,
   };
 }
 
@@ -109,7 +110,7 @@ function svg2Image(svgString: Buffer, path: string, size: string): void {
  * @param size
  */
 function pathToImage(uuidHash: string, size: string): string {
-  return `images/${size}/${uuidHash}`;
+  return `images/${workingDirectory}${size}/${uuidHash}`;
 }
 
 /**

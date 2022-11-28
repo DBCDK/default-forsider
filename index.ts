@@ -9,6 +9,19 @@ import { log } from "dbc-node-logger";
 const _ = require("lodash");
 const server = fastify();
 
+export const workingDirectory = "FISK/";
+
+// check if folders are ready
+async function checkDirectories() {
+  const good = await fileExists(workingDirectory);
+  if (!good) {
+    await Fs.mkdir(`images${workingDirectory}`);
+    await Fs.mkdir(`images${workingDirectory}/large`);
+    await Fs.mkdir(`images${workingDirectory}/thumbnail`);
+  }
+}
+
+checkDirectories();
 // public folder for (static) images
 server.register(require("@fastify/static"), {
   root: path.join(__dirname, "images"),
