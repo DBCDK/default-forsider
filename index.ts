@@ -11,7 +11,7 @@ import { getMetrics, initHistogram, registerDuration } from "./monitor";
 const _ = require("lodash");
 const server = fastify();
 
-export const workingDirectory = "FISK/";
+export const workingDirectory = process.env.IMAGE_DIR || "FISK/";
 
 // check if folders are ready
 async function checkDirectories() {
