@@ -1,6 +1,9 @@
 import { promises as Fs, stat } from "fs";
 import { existsSync } from "fs";
 import { workingDirectory } from "../index";
+import sharp from "sharp";
+
+import { log } from "dbc-node-logger";
 
 import {
   colors,
@@ -10,8 +13,12 @@ import {
   sizes,
 } from "../utils";
 import { ICovers, ICoversArray, checkRequest } from "../index";
+import { registerDuration, initHistogram } from "../monitor";
 
 const _ = require("lodash");
+
+const PERFORMANCE_HISTOGRAM_NAME = "image_generation";
+initHistogram(PERFORMANCE_HISTOGRAM_NAME);
 
 interface IReturnCover {
   error?: string;
@@ -87,9 +94,9 @@ export function generateArray(payLoad: any): Array<IReturnCover> {
  * @param size
  */
 function svg2Image(svgString: Buffer, path: string, size: string): void {
-  const sharp = require("sharp");
   const sizes =
     size === "large" ? { width: 300, height: 460 } : { width: 75, height: 115 };
+  const timestamp = performance.now();
   sharp(svgString)
     .resize(sizes)
     .jpeg({
@@ -97,9 +104,23 @@ function svg2Image(svgString: Buffer, path: string, size: string): void {
       height: sizes.height,
     })
     .toFile(`${path}.jpg`, (err: any, info: any) => {
-      console.log(svgString, "SVG");
-      console.log(err, "ERROR");
-      console.log(info, "INFO");
+      const total_ms = performance.now() - timestamp;
+      registerDuration(PERFORMANCE_HISTOGRAM_NAME, total_ms);
+
+      if (err) {
+        log.error("Image generation failed", {
+          path: `${path}.jpg`,
+          total_ms,
+        });
+        return;
+      }
+      log.info("Image generated", {
+        total_ms,
+        imgInfo: {
+          path: `${path}.jpg`,
+          size: info.size,
+        },
+      });
     });
 }
 
