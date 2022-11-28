@@ -61,8 +61,8 @@ export function generate(query: ICovers): IReturnCover {
 
   // @TODO return an object - like : {thumbNail:"thumbnail/uuidhash", detail:"large/uuidhash"}
   return {
-    thumbNail: `${workingDirectory}thumbnail/${uuidHash}.jpg`,
-    detail: `${workingDirectory}large/${uuidHash}.jpg`,
+    thumbNail: `${workingDirectory}/thumbnail/${uuidHash}.jpg`,
+    detail: `${workingDirectory}/large/${uuidHash}.jpg`,
   };
 }
 
