@@ -10,7 +10,7 @@ import { getMetrics, initHistogram, registerDuration } from "./monitor";
 
 const _ = require("lodash");
 const server = fastify();
-
+const upSince = new Date();
 export const workingDirectory = process.env.IMAGE_DIR || "FISK/";
 
 /**
@@ -218,6 +218,7 @@ server.get("/howru", async (request, reply) => {
     ok,
     metrics,
     alerts,
+    upSince,
   };
 
   if (!ok) {
