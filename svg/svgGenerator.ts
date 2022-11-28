@@ -178,7 +178,7 @@ export function splitString(longTitle: string): Array<string> {
   arrayToReturn = arrayToReturn.concat.apply(
     [],
     longTitle.split("").map(function (title, index) {
-      return index % 21 ? [] : longTitle.slice(index, index + 21) + "-";
+      return index % 16 ? [] : longTitle.slice(index, index + 16) + "-";
     })
   );
 
