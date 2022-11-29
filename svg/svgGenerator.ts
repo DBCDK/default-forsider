@@ -128,7 +128,7 @@ function svg2Image(svgString: Buffer, path: string, size: string): void {
  * @param size
  */
 function pathToImage(uuidHash: string, size: string): string {
-  return `images/${workingDirectory}${size}/${uuidHash}`;
+  return `images/${workingDirectory}/${size}/${uuidHash}`;
 }
 
 /**
