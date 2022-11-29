@@ -19,5 +19,8 @@ RUN apt-get update && apt-get install fontconfig -y
 WORKDIR /home/node/app
 COPY --chown=node:node --from=build /home/node/app/ ./
 
+# ---- Copy fonts ----
+COPY fonts/* /home/node/.local/share/fonts/
+
 USER node
 CMD ["npm", "start"]

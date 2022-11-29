@@ -4,7 +4,7 @@
         <rect width="100%" height="100%" fill="COLOR_TEMPLATE"/>
         <path d="M17.96,29V121h114.19V29H17.96Zm2,2h13v13h-13v-13Zm0,15h13v13h-13v-13Zm0,15h13v13h-13v-13Zm0,15h13v13h-13v-13Zm0,15h13v13h-13v-13Zm13,28h-13v-13h13v13Zm2,0V31H115.15V119H34.96Zm95.19,0h-13v-13h13v13Zm0-15h-13v-13h13v13Zm0-15h-13v-13h13v13Zm0-15h-13v-13h13v13Zm0-15h-13v-13h13v13Zm-13-15v-13h13v13h-13Z"/>
         <path d="M60.92,96.8l34.89-21.8-34.89-21.8v43.61Zm2-40l29.11,18.2-29.11,18.2V56.8Z"/>
-        <text id="title" x="50%" y="70%" dominant-baseline="middle" text-anchor="middle" fill="#000000" font-family="Arial, Helvetica, sans-serif" font-size="0.9em">
+        <text id="title" x="50%" y="70%" dominant-baseline="middle" text-anchor="middle" fill="#000000" font-family="IBM Plex Sans Medium" font-size="0.9em">
             TITLE_TEMPLATE
         </text>
     </svg>
