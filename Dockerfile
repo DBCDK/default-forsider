@@ -20,7 +20,7 @@ WORKDIR /home/node/app
 COPY --chown=node:node --from=build /home/node/app/ ./
 
 # ---- Copy fonts ----
-COPY ttf/* /home/node/.local/share/fonts/
+COPY fonts/* /home/node/.local/share/fonts/
 
 USER node
 RUN mkdir -p /home/node/app/images/large && mkdir -p /home/node/app/images/thumbnail
