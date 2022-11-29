@@ -19,6 +19,10 @@ RUN apt-get update && apt-get install fontconfig -y
 WORKDIR /home/node/app
 COPY --chown=node:node --from=build /home/node/app/ ./
 
+# ---- Copy fonts ----
+# RUN mkdir -p /home/node/.local/share/fonts
+COPY ttf/* /home/node/.local/share/fonts/
+
 USER node
 RUN mkdir -p /home/node/app/images/large && mkdir -p /home/node/app/images/thumbnail
 CMD ["npm", "start"]
