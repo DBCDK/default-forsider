@@ -56,22 +56,26 @@ export function encodeXmlSpecialChars(stringToEscape: string): string {
  * @file - mapping for materialTypes - mostly for default forside service
  */
 
-/* @TODO - more materialtypes .. [puslespil, punktskrift, lyd (cd), playstation 3, nintendo ds, xbox 360, psp, playstation vita, wii,  ]*/
+/* @TODO - more materialtypes .. []*/
 const materialTypeMap = {
+  Puslespil: ["puslespil"],
   Bog: [
+    "punktskrift",
     "bog",
     "billedbog",
     "tegneserie",
     "graphic novel",
-  ] /*Dækker også varianter for Billedbog, Tegneserie, Graphic novel, Stor skrift*/,
+    "bog stor skrift",
+  ],
   Lydbog: [
+    "lyd (cd)",
     "lydbog",
     "lydbog (cd)",
     "lydbog (net)",
     "lydbog (bånd)",
     "lydbog (cd-mp3)",
     "lyd",
-  ] /*Dækker også alle fysiske varianter (eksempelvis: CD, mp3, bånd) også Lydbog (net)*/,
+  ],
   Ebog: ["ebog"],
   Tidsskrift: [
     "tidsskrift",
@@ -81,12 +85,8 @@ const materialTypeMap = {
     "årbog",
     "periodikum (net)",
     "tidsskrift (net)",
-  ] /* Benyttes også for Avis, Magasin, Årbog*/,
-  Artikel: [
-    "tidsskriftsartikel",
-    "avisartikel",
-    "artikel",
-  ] /*Benyttes også for Avisartikel, Anmeldelse*/,
+  ],
+  Artikel: ["tidsskriftsartikel", "avisartikel", "artikel", "anmeldelse"],
   //Podcast = "PODCAST",
   Film: ["film", "blu-ray", "blu-ray 4k"],
   //"Tv-serie" = "TVSERIE", /* Dækker alle varianter (eksempelvis blue-ray, dvd, video) og også online (net, online) */
@@ -97,9 +97,15 @@ const materialTypeMap = {
     "dvd",
     "cd (musik)",
     "musik (net)",
-  ] /* Dækker alle varianter (eksempelvis bånd, cd, grammofonplade) */,
+  ],
   Node: ["node"],
   Computerspil: [
+    "playstation vita",
+    "wii",
+    "psp",
+    "nintendo ds",
+    "xbox 360",
+    "playstation 3",
     "xbox one",
     "playstation 4",
     "pc-spil",
@@ -107,8 +113,8 @@ const materialTypeMap = {
     "wii",
     "playstation 2",
     "xbox",
-  ] /* Dækker alle varianter (eksempelvis PC-spil, Gameboy, Playstation, Nintendo, Xbox, Wii) */,
-  //Brætspil = "BRÆTSPIL"
+  ],
+  Brætspil: ["spil"],
 };
 
 export function mapMaterialType(materialType: string): string {
