@@ -61,11 +61,11 @@ const executeBash = async (command: string): Promise<any> => {
 function cleanup() {
   // first delete files
   executeBash(
-    `find ./images -type f -name "*.jpg" -not -path "./images/${workingDirectory}/*" -delete`
+    `find ./images -type f -name "*.jpg" -not -path "./images/${workingDirectory}/*" -delete || true`
   ).then(() => {
     // now delete the (empty) directories
     exec(
-      `find ./images/* -type d -not -path "./images/${workingDirectory}*" -delete`,
+      `find ./images/* -type d -not -path "./images/${workingDirectory}*" -delete || true`,
       //"ls -la images/",
       (err, _stdout, stdErr) => {
         if (err || stdErr) {
