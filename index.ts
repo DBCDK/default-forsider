@@ -249,13 +249,13 @@ server.get("/howru", async (request, reply) => {
       over5Seconds,
       prevOver5Seconds,
     },
-    {
-      description:
-        "Number of times it takes over 5s to fetch image since last time howru was called",
-      alert: over5SecondsWait > prevOver5SecondsWait,
-      over5SecondsWait,
-      prevOver5SecondsWait,
-    },
+    // {
+    //   description:
+    //     "Number of times it takes over 5s to fetch image since last time howru was called",
+    //   alert: over5SecondsWait > prevOver5SecondsWait,
+    //   over5SecondsWait,
+    //   prevOver5SecondsWait,
+    // },
   ];
 
   prevOver5Seconds = over5Seconds;
