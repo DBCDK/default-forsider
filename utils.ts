@@ -113,6 +113,7 @@ const materialTypeMap = {
     "wii",
     "playstation 2",
     "xbox",
+    "diskette",
   ],
   Brætspil: ["spil"],
 };
