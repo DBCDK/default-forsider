@@ -11,7 +11,7 @@ import { getMetrics, initHistogram, registerDuration } from "./monitor";
 const _ = require("lodash");
 const server = fastify();
 const upSince = new Date();
-export const workingDirectory = process.env.IMAGE_DIR || "FISK";
+export const workingDirectory = process.env.IMAGE_DIR || "HUND";
 
 /**
  * Check if working directories for storing images are in place
@@ -54,27 +54,25 @@ const executeBash = async (command: string): Promise<any> => {
     );
   });
 };
+
 /**
  * Cleanup - if working directory has changed, we delete images in
  * old working directories - and then delete the old directories
  */
-function cleanup() {
-  // first delete files
-  executeBash(
-    `find ./images -type f -name "*.jpg" -not -path "./images/${workingDirectory}/*" -delete || true`
-  ).then(() => {
-    // now delete the (empty) directories
-    exec(
-      `find ./images/* -type d -not -path "./images/${workingDirectory}*" -delete || true`,
-      //"ls -la images/",
-      (err, _stdout, stdErr) => {
-        if (err || stdErr) {
-          log.error("Could not delete images");
-        }
-        log.info("All images deleted");
-      }
+async function cleanup() {
+  try {
+    // first delete files
+    await executeBash(
+      `find ./images -type f -name "*.jpg" -not -path "./images/${workingDirectory}/*" -delete || true`
     );
-  });
+    // now delete the (empty) directories
+    await executeBash(
+      `find ./images/* -type d -not -path "./images/${workingDirectory}*" -delete || true`
+      //"ls -la images/",
+    );
+  } catch (e) {
+    log.error(JSON.stringify(e));
+  }
 }
 
 checkDirectories();
