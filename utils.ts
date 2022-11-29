@@ -56,7 +56,7 @@ export function encodeXmlSpecialChars(stringToEscape: string): string {
  * @file - mapping for materialTypes - mostly for default forside service
  */
 
-/* @TODO - more materialtypes .. [puslespil, ]*/
+/* @TODO - more materialtypes .. [puslespil, punktskrift, lyd (cd), playstation 3, nintendo ds, xbox 360, psp, playstation vita, wii,  ]*/
 const materialTypeMap = {
   Bog: [
     "bog",

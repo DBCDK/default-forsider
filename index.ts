@@ -11,7 +11,7 @@ import { getMetrics, initHistogram, registerDuration } from "./monitor";
 const _ = require("lodash");
 const server = fastify();
 const upSince = new Date();
-export const workingDirectory = process.env.IMAGE_DIR || "HUND";
+export const workingDirectory = process.env.IMAGE_DIR || "HEST";
 
 /**
  * Check if working directories for storing images are in place
@@ -76,7 +76,6 @@ async function cleanup() {
 }
 
 checkDirectories();
-cleanup();
 
 // public folder for (static) images
 server.register(require("@fastify/static"), {
@@ -280,7 +279,7 @@ server.get("/hello", async (request, reply) => {
 });
 
 server.delete("/wipeAll", async (request, reply) => {
-  return await deleteAllImages();
+  return await cleanup();
 });
 
 server.listen({ port: 3000, host: "0.0.0.0" }, (err, address) => {
