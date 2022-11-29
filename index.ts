@@ -63,11 +63,11 @@ async function cleanup() {
   try {
     // first delete files
     await executeBash(
-      `find ./images -type f -name "*.jpg" -not -path "./images/${workingDirectory}/*" -delete || true`
+      `find ./images -type f -name "*.jpg" -not -path "./images/${workingDirectory}/*" -delete`
     );
     // now delete the (empty) directories
     await executeBash(
-      `find ./images/* -type d -not -path "./images/${workingDirectory}*" -delete || true`
+      `find ./images/* -type d -not -path "./images/${workingDirectory}*" -delete`
       //"ls -la images/",
     );
   } catch (e) {
