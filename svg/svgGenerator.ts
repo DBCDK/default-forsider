@@ -61,8 +61,8 @@ export function generate(query: ICovers): IReturnCover {
 
   // @TODO return an object - like : {thumbNail:"thumbnail/uuidhash", detail:"large/uuidhash"}
   return {
-    thumbNail: `${workingDirectory}thumbnail/${uuidHash}.jpg`,
-    detail: `${workingDirectory}large/${uuidHash}.jpg`,
+    thumbNail: `${workingDirectory}/thumbnail/${uuidHash}.jpg`,
+    detail: `${workingDirectory}/large/${uuidHash}.jpg`,
   };
 }
 
@@ -178,16 +178,29 @@ export function splitString(longTitle: string): Array<string> {
   arrayToReturn = arrayToReturn.concat.apply(
     [],
     longTitle.split("").map(function (title, index) {
-      return index % 16 ? [] : longTitle.slice(index, index + 16) + "-";
+      return index % 15 ? [] : longTitle.slice(index, index + 15) + "-";
     })
   );
 
+  return sanitizeArray(arrayToReturn);
+}
+
+/**
+ * Sanitize the array holding the title.
+ * @param arrayToSanitize
+ */
+function sanitizeArray(arrayToSanitize: Array<string>): Array<string> {
   // sanitize the array
   // remove last '-' in array
-  const index = arrayToReturn.length - 1;
-  arrayToReturn[index] = arrayToReturn[index].slice(0, -1);
+  const index = arrayToSanitize.length - 1;
+  arrayToSanitize[index] = arrayToSanitize[index].slice(0, -1);
 
-  return arrayToReturn;
+  // if there are more than 4 lines in array it is too big to fit the
+  // default cover - replace last entry with '...'
+  if (arrayToSanitize.length > 3) {
+    arrayToSanitize.splice(3, Infinity, "...");
+  }
+  return arrayToSanitize;
 }
 
 /**

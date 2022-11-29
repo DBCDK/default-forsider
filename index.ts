@@ -20,18 +20,66 @@ async function checkDirectories() {
   const good = await fileExists(`/${workingDirectory}`);
   if (!good) {
     await Fs.mkdir(`images/${workingDirectory}`);
-    await Fs.mkdir(`images/${workingDirectory}large`);
-    await Fs.mkdir(`images/${workingDirectory}thumbnail`);
+    await Fs.mkdir(`images/${workingDirectory}/large`);
+    await Fs.mkdir(`images/${workingDirectory}/thumbnail`);
   }
 }
 
 /**
- * Cleanup - if working directory has changed, we cleanup (delete images) in
- * old working directories
+ * Wrapper for exec command - we need an async function to delete
+ * images BEFORE we delete the directories holding them
+ * @param command
  */
-function cleanup() {}
+const executeBash = async (command: string): Promise<any> => {
+  return new Promise((resolve, reject) => {
+    const exec = require("child_process").exec;
+    exec(
+      command,
+      function (
+        error: Error,
+        stdout: string | Buffer,
+        stderr: string | Buffer
+      ) {
+        if (error) {
+          reject(error);
+          return;
+        }
+        if (stderr) {
+          reject(stderr);
+          return;
+        } else {
+          resolve(stdout);
+        }
+      }
+    );
+  });
+};
+/**
+ * Cleanup - if working directory has changed, we delete images in
+ * old working directories - and then delete the old directories
+ */
+function cleanup() {
+  // first delete files
+  executeBash(
+    `find ./images -type f -name "*.jpg" -not -path "./images/${workingDirectory}/*" -delete`
+  ).then(() => {
+    // now delete the (empty) directories
+    exec(
+      `find ./images/* -type d -not -path "./images/${workingDirectory}*" -delete`,
+      //"ls -la images/",
+      (err, _stdout, stdErr) => {
+        if (err || stdErr) {
+          log.error("Could not delete images");
+        }
+        log.info("All images deleted");
+      }
+    );
+  });
+}
 
 checkDirectories();
+cleanup();
+
 // public folder for (static) images
 server.register(require("@fastify/static"), {
   root: path.join(__dirname, "images"),
