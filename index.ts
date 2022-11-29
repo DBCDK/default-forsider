@@ -11,7 +11,7 @@ import { getMetrics, initHistogram, registerDuration } from "./monitor";
 const _ = require("lodash");
 const server = fastify();
 const upSince = new Date();
-export const workingDirectory = process.env.IMAGE_DIR || "FISK/";
+export const workingDirectory = process.env.IMAGE_DIR || "FISK";
 
 /**
  * Check if working directories for storing images are in place

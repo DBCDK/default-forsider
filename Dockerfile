@@ -20,5 +20,4 @@ WORKDIR /home/node/app
 COPY --chown=node:node --from=build /home/node/app/ ./
 
 USER node
-RUN mkdir -p /home/node/app/images/large && mkdir -p /home/node/app/images/thumbnail
 CMD ["npm", "start"]
