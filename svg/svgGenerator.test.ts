@@ -72,6 +72,24 @@ test("split on space, will not add hyphen", () => {
   expect(actual).toEqual(expected);
 });
 
+test("Seen in the wild", () => {
+  expect(splitString("Emballagefri supermarkeder", 15, 15, 4)).toEqual([
+    "Emballagefri",
+    "supermarkeder",
+  ]);
+
+  expect(splitString("Skal du have dårlig", 15, 15, 4)).toEqual([
+    "Skal du have",
+    "dårlig",
+  ]);
+
+  expect(splitString("Miljøforskere blah at milliarder", 15, 15, 4)).toEqual([
+    "Miljøforskere",
+    "blah at milli-",
+    "arder",
+  ]);
+});
+
 test("rules for word splitting", () => {
   expect(canSplitAtPos("målingerne", 1)).toEqual(false); // m-ålingerne - Der er ingen vokal på venstre side + mindst 3 karakterer
   expect(canSplitAtPos("målingerne", 2)).toEqual(false); // må-lingerne - Vi vil have mindst 3 karakterer på hver side
