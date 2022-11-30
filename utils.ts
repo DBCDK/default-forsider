@@ -90,7 +90,15 @@ const materialTypeMap = {
   ],
   Artikel: ["tidsskriftsartikel", "avisartikel", "artikel", "anmeldelse"],
   //Podcast = "PODCAST",
-  Film: ["film", "blu-ray", "blu-ray 4k", "film (net)", "blu-ray 3D", "video"],
+  Film: [
+    "film",
+    "blu-ray",
+    "blu-ray 4k",
+    "film (net)",
+    "blu-ray 3D",
+    "video",
+    "biograffilm",
+  ],
   //"Tv-serie" = "TVSERIE", /* Dækker alle varianter (eksempelvis blue-ray, dvd, video) og også online (net, online) */
   Musik: [
     "musik",
