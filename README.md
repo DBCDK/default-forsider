@@ -18,7 +18,7 @@ fastify will be listening on localhost:3000
     value: "covers"
 - set the 'value' to something else - it will change the directory where images are stored and retrieved.
 - REMEMBER to cleanup (to be nice) after you have changed the working dir like so:
-- curl -X DELETE https://default-forsider.dbc.dk//wipeAll
+- curl -X DELETE https://default-forsider.dbc.dk/wipeAll
 
 
 
