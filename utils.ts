@@ -96,7 +96,7 @@ const materialTypeMap = {
     "blu-ray",
     "blu-ray 4k",
     "film (net)",
-    "blu-ray 3D",
+    "blu-ray 3d",
     "video",
     "biograffilm",
   ],
