@@ -151,7 +151,7 @@ function randomColor(): string {
 function replaceInSvg(svg: string, title: string): string {
   const svgColor = randomColor();
   // split string if it is to long
-  const lines = splitString(title);
+  const lines = splitString(title, 15, 15, 4);
   // insert each part of string in <tspan> element
   const svgTitle = lines
     .map(
@@ -164,43 +164,134 @@ function replaceInSvg(svg: string, title: string): string {
     .replace("COLOR_TEMPLATE", svgColor);
 }
 
-/**
- * Attempt to split a long title...
- * TODO -- a better split string function - it looks horrible
- *
- * @param longTitle
- */
-export function splitString(longTitle: string): Array<string> {
-  const parts = longTitle.split(" ");
-  let arrayToReturn: Array<string> = [];
+const INVALID_CONSONANT_CONNECTIONS_BEGINNING = new Set([
+  "CH",
+  "pp",
+  "ng",
+  "ps",
+]);
+const INVALID_CONSONANT_CONNECTIONS_END = new Set(["tr", "ll", "pp", "tt"]);
+const VOCALS = "aeiouyæøå";
 
-  // from google
-  arrayToReturn = arrayToReturn.concat.apply(
-    [],
-    longTitle.split("").map(function (title, index) {
-      return index % 15 ? [] : longTitle.slice(index, index + 15) + "-";
-    })
-  );
-
-  return sanitizeArray(arrayToReturn);
+function hasVocals(str: string): boolean {
+  for (var i = 0; i < str.length; i++) {
+    if (VOCALS.includes(str.charAt(i))) {
+      return true;
+    }
+  }
+  return false;
 }
 
 /**
- * Sanitize the array holding the title.
- * @param arrayToSanitize
+ * Checks if it is ok to split a word at a specific position
+ *
+ * Performance wise, this is not optimized - but hopefully its
+ * probably fast enough..
+ *
+ * We try to use these rules:
+ * https://dsn.dk/ordboeger/retskrivningsordbogen/%C2%A7-15-17-orddeling-ved-linjeskift/%C2%A7-15-almindelige-retningslinjer/
+ *
  */
-function sanitizeArray(arrayToSanitize: Array<string>): Array<string> {
-  // sanitize the array
-  // remove last '-' in array
-  const index = arrayToSanitize.length - 1;
-  arrayToSanitize[index] = arrayToSanitize[index].slice(0, -1);
+export function canSplitAtPos(text: string, pos: number): boolean {
+  const lowerCased = text.toLowerCase();
+  let leftFull = lowerCased.slice(0, pos);
+  leftFull = leftFull.slice(
+    Math.max(leftFull.lastIndexOf(" "), 0),
+    leftFull.length
+  );
+  let rightFull = lowerCased.slice(pos, lowerCased.length);
+  const spacePosRight = rightFull.indexOf(" ");
+  rightFull = rightFull.slice(
+    0,
+    spacePosRight > -1 ? spacePosRight : rightFull.length
+  );
 
-  // if there are more than 4 lines in array it is too big to fit the
-  // default cover - replace last entry with '...'
-  if (arrayToSanitize.length > 3) {
-    arrayToSanitize.splice(3, Infinity, "...");
+  const leftTwoCharacters = lowerCased.slice(Math.max(pos - 2, 0), pos);
+  const rightTwoCharacters = lowerCased.slice(
+    pos,
+    Math.min(pos + 2, lowerCased.length)
+  );
+
+  if (leftFull.length < 3 || rightFull.length < 3) {
+    // We don't want short strings to be split.
+    // This is not part of the dsn rules - but our own
+    return false;
   }
-  return arrayToSanitize;
+  if (!hasVocals(leftFull)) {
+    return false;
+  }
+  if (!hasVocals(rightFull)) {
+    return false;
+  }
+  if (INVALID_CONSONANT_CONNECTIONS_BEGINNING.has(rightTwoCharacters)) {
+    return false;
+  }
+  if (INVALID_CONSONANT_CONNECTIONS_END.has(leftTwoCharacters)) {
+    return false;
+  }
+
+  return true;
+}
+
+export function splitString(
+  longTitle: string,
+  minWidth: number,
+  maxWidth: number,
+  maxLines: number
+): Array<string> {
+  const res = [];
+
+  // Try to divide characters evenly on four lines
+  let width;
+  if (longTitle.length <= maxWidth) {
+    // Fits on one line
+    width = maxWidth;
+  } else if (longTitle.length / maxLines <= maxWidth) {
+    // Fits on four lines, try to equal amount of characters per line
+    width = Math.max(minWidth, Math.round(longTitle.length / maxLines));
+  } else {
+    // Exceeds four lines
+    width = maxWidth;
+  }
+
+  // Loop through the long title
+  let i = 0;
+  while (i < longTitle.length) {
+    // Jump to the current position + the calculated width
+    // And then move back, until a valid split position is found
+    let validSplitPos = i + width;
+    let addHyphen = false;
+    for (let j = validSplitPos; j > i; j--) {
+      if (longTitle.charAt(j) === "") {
+        // the end
+        break;
+      }
+      if (longTitle.charAt(j) === " ") {
+        // This is a sapce, we can break line without hyphen
+        validSplitPos = j;
+        break;
+      } else if (canSplitAtPos(longTitle, j)) {
+        // Found a position inside a word, where its ok to break
+        // and we add a hyphen
+        validSplitPos = j;
+        addHyphen = true;
+        break;
+      }
+    }
+    res.push(longTitle.slice(i, validSplitPos) + (addHyphen ? "-" : ""));
+
+    // Set the next offset, to the found valid position
+    i = validSplitPos;
+  }
+
+  // Add dots if title is too long
+  if (res.length > maxLines) {
+    res[maxLines - 1] =
+      res[maxLines - 1].slice(0, res[maxLines - 1].length - 3) + "...";
+  }
+
+  // Tada
+  return res.slice(0, maxLines).map((line) => line.trim());
 }
 
 /**
