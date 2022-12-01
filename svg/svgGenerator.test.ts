@@ -72,7 +72,7 @@ test("split on space, will not add hyphen", () => {
   expect(actual).toEqual(expected);
 });
 
-test.only("Seen in the wild", () => {
+test("Seen in the wild", () => {
   expect(splitString("Emballagefri supermarkeder", 15, 15, 4)).toEqual([
     "Emballagefri",
     "supermarkeder",
