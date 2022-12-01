@@ -56,7 +56,7 @@
      text-anchor="middle"
      fill="#000000"
      font-family="IBM Plex Sans Medium"
-     font-size="2.5em">
+     >
         TITLE_TEMPLATE
     </text>
 </svg>

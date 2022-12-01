@@ -152,11 +152,19 @@ function replaceInSvg(svg: string, title: string): string {
   const svgColor = randomColor();
   // split string if it is to long
   const lines = splitString(title, 15, 15, 4, 15);
+
+  const largeFont =
+    lines.every((line) => line.length <= 11) && lines.length <= 2;
+
+  const lineHeight = largeFont ? 50 : 38;
+  const fontSize = largeFont ? 39 : 30;
   // insert each part of string in <tspan> element
   const svgTitle = lines
     .map(
       (line) =>
-        '<tspan x="50%" dy="1.2em">' + encodeXmlSpecialChars(line) + "</tspan>"
+        `<tspan x="50%" font-size="${fontSize}px" dy="${lineHeight}px">` +
+        encodeXmlSpecialChars(line) +
+        "</tspan>"
     )
     .join(" ");
   return svg
