@@ -1,16 +1,10 @@
 <svg width="300" height="460" viewBox="0 0 300 460" fill="none" xmlns="http://www.w3.org/2000/svg">
     <rect width="300" height="460" fill="COLOR_TEMPLATE"/>
-    <path d="M116,130.76H31.35V19.25H116v111.51Zm-82.65-2H114V21.25H33.35v107.51Z" fill="black"/>
-    <path d="M69.99,66.25h-25.07V34.25h25.07v32Zm-23.07-2h21.07v-28h-21.07v28Z" fill="black"/>
-    <rect x="80" y="64.25" width="25" height="2" fill="black"/>
-    <rect x="80" y="49.25" width="25" height="2" fill="black"/>
-    <rect x="80" y="34.25" width="25" height="2" fill="black"/>
-    <rect x="45" y="79.25" width="25" height="2" fill="black"/>
-    <rect x="45" y="94.25" width="25" height="2" fill="black"/>
-    <rect x="45" y="109.25" width="25" height="2" fill="black"/>
-    <rect x="80" y="79.25" width="25" height="2" fill="black"/>
-    <rect x="80" y="94.25" width="25" height="2" fill="black"/>
-    <rect x="80" y="109.25" width="25" height="2" fill="black"/>
+    <path d="M105.96,29l-.04-14L31.34,29h-.11v101.65H118.69V29h-12.73Zm-2.03-11.55l.03,11.55H42.22l61.72-11.55Zm12.76,111.2H33.23V31H116.69v97.65Z" fill="black"/>
+    <path d="M104.96,44H44.96v27h60v-27Zm-2,25H46.96v-23h56v23Z" fill="black"/>
+    <rect x="44.96" y="99" width="60" height="2" fill="black"/>
+    <rect x="44.96" y="84" width="60" height="2" fill="black"/>
+    <rect x="44.96" y="114" width="60" height="2" fill="black"/>
     <line x1="125" y1="227" x2="175" y2="227" stroke="#212121" stroke-width="2" fill="black"/>
     <text id="title" x="50%" y="60%" dominant-baseline="middle" text-anchor="middle" fill="#000000"
           font-family="IBM Plex Sans Medium" font-size="2.5em" >
