@@ -11,6 +11,7 @@ export enum materialTypes {
   Node = "NODE",
   Computerspil = "COMPUTERSPIL" /* Dækker alle varianter (eksempelvis PC-spil, Gameboy, Playstation, Nintendo, Xbox, Wii) */,
   Brætspil = "BRÆTSPIL",
+  Default = "DEFAULT",
 }
 
 export enum colors {
@@ -140,5 +141,5 @@ export function mapMaterialType(materialType: string): string {
   if (!found) {
     console.log("MATTYPE " + materialType + "NOT FOUND");
   }
-  return "Bog";
+  return "Default";
 }

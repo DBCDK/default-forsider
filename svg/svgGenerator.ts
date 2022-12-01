@@ -3,6 +3,7 @@ import { existsSync } from "fs";
 import { workingDirectory } from "../index";
 import sharp from "sharp";
 
+// @ts-ignore
 import { log } from "dbc-node-logger";
 
 import {
@@ -39,6 +40,7 @@ export function generate(query: ICovers): IReturnCover {
   const getUuid = require("uuid-by-string");
 
   const status = checkRequest(query);
+
   if (!status.status) {
     console.log(status);
     return {
