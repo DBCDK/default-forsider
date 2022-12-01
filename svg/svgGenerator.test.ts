@@ -101,6 +101,17 @@ test("Seen in the wild", () => {
   expect(
     splitString("harry potter og hemmlighedernes kammer", 15, 15, 4, 15)
   ).toEqual(["harry potter og", "hemmligheder-", "nes kammer"]);
+
+  // Prefer to split at "-"
+  expect(
+    splitString(
+      "Historiens største e-sportssatsning kan floppe fælt",
+      15,
+      15,
+      4,
+      15
+    )
+  ).toEqual(["Historiens", "største e-", "sportssatsning", "kan flo..."]);
 });
 
 test("rules for word splitting", () => {

@@ -894,6 +894,9 @@ export function canSplitAtPos(
     Math.min(pos + 2, lowerCased.length)
   );
 
+  if (leftFull.includes("-")) {
+    return false;
+  }
   if (leftFull.length + rightFull.length < wordSplitThreshold) {
     // Word is too short to split
     return false;
@@ -953,8 +956,13 @@ export function splitString(
         // the end
         break;
       }
+      if (longTitle.charAt(j) === "-") {
+        // This is -, we can break line without hyphen
+        validSplitPos = j + 1;
+        break;
+      }
       if (longTitle.charAt(j) === " ") {
-        // This is a sapce, we can break line without hyphen
+        // This is a space we can break line without hyphen
         validSplitPos = j;
         break;
       } else if (canSplitAtPos(longTitle, j, wordSplitThreshold)) {
