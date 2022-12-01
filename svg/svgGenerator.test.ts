@@ -88,6 +88,19 @@ test("Seen in the wild", () => {
     "blah at milli-",
     "arder",
   ]);
+
+  expect(
+    splitString("Miljøforskere blah at milliarder", 15, 15, 4, 15)
+  ).toEqual(["Miljøforskere", "blah at", "milliarder"]);
+
+  expect(splitString("Psykopaten på den hvide hest", 15, 15, 4)).toEqual([
+    "Psykopaten på",
+    "den hvide hest",
+  ]);
+
+  expect(
+    splitString("harry potter og hemmlighedernes kammer", 15, 15, 4, 15)
+  ).toEqual(["harry potter og", "hemmligheder-", "nes kammer"]);
 });
 
 test("rules for word splitting", () => {
