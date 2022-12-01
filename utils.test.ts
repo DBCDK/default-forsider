@@ -1,37 +1,36 @@
-import {encodeXmlSpecialChars, mapMaterialType} from "./utils";
-
+import { encodeXmlSpecialChars, mapMaterialType } from "./utils";
 
 test("escape ampersand", () => {
-    const weirdtitle = "Hest & pony : pleje & pasning";
-    const actual = encodeXmlSpecialChars(weirdtitle);
-    const expected = "Hest &amp; pony : pleje &amp; pasning"
-    expect(actual).toEqual(expected);
-})
+  const weirdtitle = "Hest & pony : pleje & pasning";
+  const actual = encodeXmlSpecialChars(weirdtitle);
+  const expected = "Hest &amp; pony : pleje &amp; pasning";
+  expect(actual).toEqual(expected);
+});
 
-test("escape all specialchars",() => {
-    const weirdtitle = "Hest < ' & pony >  : pleje & pasning";
-    const actual = encodeXmlSpecialChars(weirdtitle);
-    const expected = "Hest &lt; ' &amp; pony &gt;  : pleje &amp; pasning"
-    expect(actual).toEqual(expected);
-})
+test("escape all specialchars", () => {
+  const weirdtitle = "Hest < ' & pony >  : pleje & pasning";
+  const actual = encodeXmlSpecialChars(weirdtitle);
+  const expected = "Hest &lt; ' &amp; pony &gt;  : pleje &amp; pasning";
+  expect(actual).toEqual(expected);
+});
 
-test("map MaterialTypes",() => {
-    const matType = "lydbog (net)";
-    const actual = mapMaterialType(matType);
-    const expected = "Lydbog"
-    expect(actual).toEqual(expected);
-})
+test("map MaterialTypes", () => {
+  const matType = "lydbog (net)";
+  const actual = mapMaterialType(matType);
+  const expected = "Lydbog";
+  expect(actual).toEqual(expected);
+});
 
-test("map MaterialTypes",() => {
-    const matType = "fisk";
-    const actual = mapMaterialType(matType);
-    const expected = "Bog"
-    expect(actual).toEqual(expected);
-})
+test("map MaterialTypes", () => {
+  const matType = "fisk";
+  const actual = mapMaterialType(matType);
+  const expected = "Default";
+  expect(actual).toEqual(expected);
+});
 
-test("map MaterialTypes",() => {
-    const matType = "årbog";
-    const actual = mapMaterialType(matType);
-    const expected = "Tidsskrift"
-    expect(actual).toEqual(expected);
-})
+test("map MaterialTypes", () => {
+  const matType = "årbog";
+  const actual = mapMaterialType(matType);
+  const expected = "Tidsskrift";
+  expect(actual).toEqual(expected);
+});

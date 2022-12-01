@@ -11,7 +11,9 @@ COPY --chown=node:node . .
 
 # install node packages
 RUN npm set progress=false && npm config set depth 0 && \
-    npm install && npm run build
+    npm install
+
+RUN npm test
 
 # ---- Release ----
 FROM $NODE_BASEIMAGE AS release
