@@ -56,7 +56,7 @@ export function encodeXmlSpecialChars(stringToEscape: string): string {
  * @file - mapping for materialTypes - mostly for default forside service
  */
 
-/* @TODO - more materialtypes .. [dias, plakat, teateropførelse, billede, sang, elektronisk materiale (cd), laborativt materiale, grafisk blad]*/
+/* @TODO - more materialtypes .. [dias, plakat, teateropførelse, cd rom, billede, sang, elektronisk materiale (cd), laborativt materiale, grafisk blad]*/
 const materialTypeMap = {
   Puslespil: ["puslespil"],
   Bog: [
