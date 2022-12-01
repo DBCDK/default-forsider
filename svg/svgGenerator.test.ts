@@ -72,7 +72,7 @@ test("split on space, will not add hyphen", () => {
   expect(actual).toEqual(expected);
 });
 
-test("Seen in the wild", () => {
+test.only("Seen in the wild", () => {
   expect(splitString("Emballagefri supermarkeder", 15, 15, 4)).toEqual([
     "Emballagefri",
     "supermarkeder",
@@ -88,6 +88,19 @@ test("Seen in the wild", () => {
     "blah at milli-",
     "arder",
   ]);
+
+  expect(
+    splitString("Miljøforskere blah at milliarder", 15, 15, 4, 15)
+  ).toEqual(["Miljøforskere", "blah at", "milliarder"]);
+
+  expect(splitString("Psykopaten på den hvide hest", 15, 15, 4)).toEqual([
+    "Psykopaten på",
+    "den hvide hest",
+  ]);
+
+  expect(
+    splitString("harry potter og hemmlighedernes kammer", 15, 15, 4, 15)
+  ).toEqual(["harry potter og", "hemmligheder-", "nes kammer"]);
 });
 
 test("rules for word splitting", () => {

@@ -151,7 +151,7 @@ function randomColor(): string {
 function replaceInSvg(svg: string, title: string): string {
   const svgColor = randomColor();
   // split string if it is to long
-  const lines = splitString(title, 15, 15, 4);
+  const lines = splitString(title, 15, 15, 4, 15);
   // insert each part of string in <tspan> element
   const svgTitle = lines
     .map(
@@ -863,7 +863,11 @@ function hasVocals(str: string): boolean {
  * https://dsn.dk/ordboeger/retskrivningsordbogen/%C2%A7-15-17-orddeling-ved-linjeskift/%C2%A7-15-almindelige-retningslinjer/
  *
  */
-export function canSplitAtPos(text: string, pos: number): boolean {
+export function canSplitAtPos(
+  text: string,
+  pos: number,
+  wordSplitThreshold: number = 0
+): boolean {
   const lowerCased = text.toLowerCase();
   let leftFull = lowerCased.slice(0, pos);
   leftFull = leftFull.slice(leftFull.lastIndexOf(" ") + 1, leftFull.length);
@@ -880,6 +884,10 @@ export function canSplitAtPos(text: string, pos: number): boolean {
     Math.min(pos + 2, lowerCased.length)
   );
 
+  if (leftFull.length + rightFull.length < wordSplitThreshold) {
+    // Word is too short to split
+    return false;
+  }
   if (leftFull.length < 3 || rightFull.length < 3) {
     // We don't want short strings to be split.
     // This is not part of the dsn rules - but our own
@@ -905,7 +913,8 @@ export function splitString(
   longTitle: string,
   minWidth: number,
   maxWidth: number,
-  maxLines: number
+  maxLines: number,
+  wordSplitThreshold: number = 0
 ): Array<string> {
   const res = [];
 
@@ -938,7 +947,7 @@ export function splitString(
         // This is a sapce, we can break line without hyphen
         validSplitPos = j;
         break;
-      } else if (canSplitAtPos(longTitle, j)) {
+      } else if (canSplitAtPos(longTitle, j, wordSplitThreshold)) {
         // Found a position inside a word, where its ok to break
         // and we add a hyphen
         validSplitPos = j;
