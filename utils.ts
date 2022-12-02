@@ -114,6 +114,7 @@ const materialTypeMap = {
   Computerspil: [
     "playstation vita",
     "wii",
+    "wii u",
     "psp",
     "nintendo ds",
     "xbox 360",
@@ -121,6 +122,7 @@ const materialTypeMap = {
     "xbox one",
     "playstation 4",
     "pc-spil",
+    "pc-spil (net)",
     "nintendo switch",
     "wii",
     "playstation 2",
