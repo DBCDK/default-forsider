@@ -17,41 +17,41 @@
      id="rect830" />
   <path
      d="m 178.56536,70 -0.04,-14 -74.58,14 h -0.11 v 101.65 h 87.46 V 70 Z m -2.03,-11.55 0.03,11.55 h -61.74 l 61.72,-11.55 z m 12.76,111.2 h -83.46 V 72 h 83.46 z"
-     fill="#000000"
+     fill="FOREGROUND_COLOR"
      id="path832" />
   <path
      d="m 177.56536,85 h -60 v 27 h 60 z m -2,25 h -56 V 87 h 56 z"
-     fill="#000000"
+     fill="FOREGROUND_COLOR"
      id="path834" />
   <rect
      x="117.56536"
      y="140"
      width="60"
      height="2"
-     fill="#000000"
+     fill="FOREGROUND_COLOR"
      id="rect836" />
   <rect
      x="117.56536"
      y="125"
      width="60"
      height="2"
-     fill="#000000"
+     fill="FOREGROUND_COLOR"
      id="rect838" />
   <rect
      x="117.56536"
      y="155"
      width="60"
      height="2"
-     fill="#000000"
+     fill="FOREGROUND_COLOR"
      id="rect840" />
   <line
      x1="125"
      y1="227"
      x2="175"
      y2="227"
-     stroke="#212121"
+     stroke="FOREGROUND_COLOR"
      stroke-width="2"
-     fill="black"
+     fill="FOREGROUND_COLOR"
      id="line842" />
   <text
      id="title"
@@ -59,7 +59,7 @@
      y="60%"
      dominant-baseline="middle"
      text-anchor="middle"
-     fill="#000000"
+     fill="FOREGROUND_COLOR"
      font-family="IBM Plex Sans Medium"
      >
         TITLE_TEMPLATE

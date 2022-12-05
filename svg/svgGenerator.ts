@@ -7,8 +7,11 @@ import sharp from "sharp";
 import { log } from "dbc-node-logger";
 
 import {
-  colors,
+  colors as defaultCovers,
+  CoverColor,
+  distance,
   encodeXmlSpecialChars,
+  hexToRgb,
   mapMaterialType,
   materialTypes,
   sizes,
@@ -33,7 +36,7 @@ interface IReturnCover {
  * @param query
  */
 export function generate(query: ICovers): IReturnCover {
-  const { title, materialType } = query;
+  const { title, materialType, colors } = query;
 
   const mappedMaterial: string = mapMaterialType(materialType);
   // we need to generate same hash each time - use 'uuid-by-string' @see https://www.npmjs.com/package/uuid-by-string
@@ -53,7 +56,7 @@ export function generate(query: ICovers): IReturnCover {
     read(mappedMaterial).then((svgAsString) => {
       // @TODO check string - it might be empty
 
-      const buf = Buffer.from(replaceInSvg(svgAsString, title));
+      const buf = Buffer.from(replaceInSvg(svgAsString, title, colors));
       Object.keys(sizes).forEach((size) => {
         const imagePath = pathToImage(uuidHash, size);
         svg2Image(buf, imagePath, size);
@@ -101,7 +104,7 @@ function svg2Image(svgString: Buffer, path: string, size: string): void {
   const timestamp = performance.now();
   sharp(svgString)
     .resize(sizes)
-    .jpeg()
+    .jpeg({ chromaSubsampling: "4:4:4", quality: 80 })
     .toFile(`${path}.jpg`, (err: any, info: any) => {
       const total_ms = performance.now() - timestamp;
       registerDuration(PERFORMANCE_HISTOGRAM_NAME, total_ms);
@@ -136,8 +139,8 @@ function pathToImage(uuidHash: string, size: string): string {
 /**
  * Get a random color from colors enum.
  */
-function randomColor(): string {
-  const items = Object.values(colors);
+function randomColor(colors?: Array<CoverColor>): CoverColor {
+  const items = colors || defaultCovers;
   const keys = Object.keys(items);
   const random: number = +keys[Math.floor(Math.random() * keys.length)];
 
@@ -150,10 +153,21 @@ function randomColor(): string {
  * @param svg
  * @param title
  */
-function replaceInSvg(svg: string, title: string): string {
-  const svgColor = randomColor();
+function replaceInSvg(
+  svg: string,
+  title: string,
+  colors?: Array<CoverColor>
+): string {
+  const svgColor = randomColor(colors);
   // split string if it is to long
   const lines = splitString(title, 15, 15, 4, 15);
+
+  const textColor =
+    svgColor.text ||
+    (distance([0, 0, 0], hexToRgb(svgColor.background)) >
+    distance([255, 255, 255], hexToRgb(svgColor.background))
+      ? "black"
+      : "white");
 
   const largeFont =
     lines.every((line) => line.length <= 11) && lines.length <= 2;
@@ -171,7 +185,8 @@ function replaceInSvg(svg: string, title: string): string {
     .join(" ");
   return svg
     .replace("TITLE_TEMPLATE", svgTitle)
-    .replace("COLOR_TEMPLATE", svgColor);
+    .replace("COLOR_TEMPLATE", svgColor.background)
+    .replace(/FOREGROUND_COLOR/g, textColor);
 }
 
 const INVALID_CONSONANT_CONNECTIONS_BEGINNING = new Set([

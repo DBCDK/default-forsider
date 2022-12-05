@@ -17,12 +17,12 @@
             id="rect230"/>
     <path
             d="m 191.7578,173.19977 h -84.65 V 56.535768 h 84.65 z m -82.65,-2.09244 h 80.65 V 58.628208 h -80.65 z"
-            fill="#000000"
+            fill="FOREGROUND_COLOR"
             id="path232"
             style="stroke-width:1.02285"/>
     <path
             d="m 145.7478,105.70812 h -25.07 V 72.229069 h 25.07 z m -23.07,-2.09245 h 21.07 V 74.321509 h -21.07 z"
-            fill="#000000"
+            fill="FOREGROUND_COLOR"
             id="path234"
             style="stroke-width:1.02285"/>
     <rect
@@ -30,7 +30,7 @@
             y="103.61568"
             width="25"
             height="2.0924401"
-            fill="#000000"
+            fill="FOREGROUND_COLOR"
             id="rect236"
             style="stroke-width:1.02285"/>
     <rect
@@ -38,7 +38,7 @@
             y="87.922379"
             width="25"
             height="2.0924401"
-            fill="#000000"
+            fill="FOREGROUND_COLOR"
             id="rect238"
             style="stroke-width:1.02285"/>
     <rect
@@ -46,7 +46,7 @@
             y="72.22908"
             width="25"
             height="2.0924401"
-            fill="#000000"
+            fill="FOREGROUND_COLOR"
             id="rect240"
             style="stroke-width:1.02285"/>
     <rect
@@ -54,7 +54,7 @@
             y="119.30898"
             width="25"
             height="2.0924401"
-            fill="#000000"
+            fill="FOREGROUND_COLOR"
             id="rect242"
             style="stroke-width:1.02285"/>
     <rect
@@ -62,7 +62,7 @@
             y="135.00227"
             width="25"
             height="2.0924401"
-            fill="#000000"
+            fill="FOREGROUND_COLOR"
             id="rect244"
             style="stroke-width:1.02285"/>
     <rect
@@ -70,7 +70,7 @@
             y="150.69557"
             width="25"
             height="2.0924401"
-            fill="#000000"
+            fill="FOREGROUND_COLOR"
             id="rect246"
             style="stroke-width:1.02285"/>
     <rect
@@ -78,7 +78,7 @@
             y="119.30898"
             width="25"
             height="2.0924401"
-            fill="#000000"
+            fill="FOREGROUND_COLOR"
             id="rect248"
             style="stroke-width:1.02285"/>
     <rect
@@ -86,7 +86,7 @@
             y="135.00227"
             width="25"
             height="2.0924401"
-            fill="#000000"
+            fill="FOREGROUND_COLOR"
             id="rect250"
             style="stroke-width:1.02285"/>
     <rect
@@ -94,7 +94,7 @@
             y="150.69557"
             width="25"
             height="2.0924401"
-            fill="#000000"
+            fill="FOREGROUND_COLOR"
             id="rect252"
             style="stroke-width:1.02285"/>
     <line
@@ -102,9 +102,9 @@
             y1="227"
             x2="175"
             y2="227"
-            stroke="#212121"
+            stroke="FOREGROUND_COLOR"
             stroke-width="2"
-            fill="black"
+            fill="FOREGROUND_COLOR"
             id="line254"/>
     <text
             id="title"
@@ -112,7 +112,7 @@
             y="60%"
             dominant-baseline="middle"
             text-anchor="middle"
-            fill="#000000"
+            fill="FOREGROUND_COLOR"
             font-family="IBM Plex Sans Medium"
             >
         TITLE_TEMPLATE
