@@ -162,7 +162,7 @@ function replaceInSvg(
 ): string {
   const svgColor = randomColor(colors);
   // split string if it is to long
-  const lines = splitString(title, 15, 15, 4, 15);
+  const linesNarrow = splitString(title, 11, 11, 4, 11);
 
   const textColor =
     svgColor.text ||
@@ -171,8 +171,15 @@ function replaceInSvg(
       ? "black"
       : "white");
 
-  const largeFont =
-    lines.every((line) => line.length <= 11) && lines.length <= 2;
+  let largeFont = false;
+  let lines;
+  if (linesNarrow.length <= 3) {
+    largeFont = true;
+    lines = linesNarrow;
+  } else {
+    const linesWide = splitString(title, 15, 15, 4, 15);
+    lines = linesWide;
+  }
 
   const lineHeight = largeFont ? 50 : 38;
   const fontSize = largeFont ? 39 : 30;
