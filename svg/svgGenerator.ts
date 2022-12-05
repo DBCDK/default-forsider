@@ -51,7 +51,9 @@ export function generate(query: ICovers): IReturnCover {
     };
   }
 
-  const uuidHash = getUuid(`${title}${mappedMaterial}`);
+  const uuidHash = getUuid(
+    `${title}${mappedMaterial}${colors ? JSON.stringify(colors) : ""}`
+  );
   if (!doesFileExist(uuidHash)) {
     read(mappedMaterial).then((svgAsString) => {
       // @TODO check string - it might be empty
