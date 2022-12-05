@@ -183,15 +183,34 @@ function replaceInSvg(
 
   const lineHeight = largeFont ? 50 : 38;
   const fontSize = largeFont ? 39 : 30;
+
+  // vertically align text based on size and number of lines
+  // change this if we find a way to do it automatically
+  const offsets: any = {
+    "large-1": "65%",
+    "large-2": "60%",
+    "large-3": "55%",
+    "small-1": "66%",
+    "small-2": "63%",
+    "small-3": "60%",
+    "small-4": "56%",
+  };
+  const textY =
+    offsets[`${largeFont ? "large" : "small"}-${lines.length}`] || "60%";
+
   // insert each part of string in <tspan> element
-  const svgTitle = lines
-    .map(
-      (line) =>
-        `<tspan x="50%" font-size="${fontSize}px" dy="${lineHeight}px">` +
-        encodeXmlSpecialChars(line) +
-        "</tspan>"
-    )
-    .join(" ");
+  const svgTitle = `<text id="title" x="50%" y="${textY}" dominant-baseline="center" text-anchor="middle" fill="${textColor}"
+          font-family="IBM Plex Sans Medium" >
+        ${lines
+          .map(
+            (line) =>
+              `<tspan x="50%" font-size="${fontSize}px" dy="${lineHeight}px">` +
+              encodeXmlSpecialChars(line) +
+              "</tspan>"
+          )
+          .join(" ")}
+    </text>`;
+
   return svg
     .replace("TITLE_TEMPLATE", svgTitle)
     .replace("COLOR_TEMPLATE", svgColor.background)
