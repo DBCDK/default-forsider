@@ -173,6 +173,7 @@ export function checkRequest(query: ICovers): IRequestStatus {
 export interface ICovers {
   title: string;
   materialType: materialTypes;
+  colors?: Array<CoverColor>;
 }
 
 interface IHeaders {

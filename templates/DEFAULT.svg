@@ -21,9 +21,9 @@
             y1="227"
             x2="175"
             y2="227"
-            stroke="#212121"
+            stroke="FOREGROUND_COLOR"
             stroke-width="2"
-            fill="black"
+            fill="FOREGROUND_COLOR"
             id="line602" />
     <text
             id="title"
@@ -31,7 +31,7 @@
             y="60%"
             dominant-baseline="middle"
             text-anchor="middle"
-            fill="#000000"
+            fill="FOREGROUND_COLOR"
             font-family="IBM Plex Sans Medium"
             font-size="2.5em">
         TITLE_TEMPLATE

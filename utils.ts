@@ -14,13 +14,18 @@ export enum materialTypes {
   Default = "DEFAULT",
 }
 
-export enum colors {
-  BBE2EE = "#BBE2EE",
-  CBF1EE = "#CBF1EE",
-  DDFEF0 = "#DDFEF0",
-  FFEEBD = "#FFEEBD",
-  F1F2F2 = "#F1F2F2",
+export interface CoverColor {
+  background: string;
+  text?: string;
 }
+
+export const colors: Array<CoverColor> = [
+  { background: "#BBE2EE" },
+  { background: "#CBF1EE" },
+  { background: "#DDFEF0" },
+  { background: "#FFEEBD" },
+  { background: "#F1F2F2" },
+];
 
 export enum sizes {
   thumbnail = "THUMBNAIL",

@@ -7,7 +7,8 @@ import sharp from "sharp";
 import { log } from "dbc-node-logger";
 
 import {
-  colors,
+  colors as defaultCovers,
+  CoverColor,
   encodeXmlSpecialChars,
   mapMaterialType,
   materialTypes,
@@ -33,7 +34,7 @@ interface IReturnCover {
  * @param query
  */
 export function generate(query: ICovers): IReturnCover {
-  const { title, materialType } = query;
+  const { title, materialType, colors } = query;
 
   const mappedMaterial: string = mapMaterialType(materialType);
   // we need to generate same hash each time - use 'uuid-by-string' @see https://www.npmjs.com/package/uuid-by-string
@@ -53,7 +54,7 @@ export function generate(query: ICovers): IReturnCover {
     read(mappedMaterial).then((svgAsString) => {
       // @TODO check string - it might be empty
 
-      const buf = Buffer.from(replaceInSvg(svgAsString, title));
+      const buf = Buffer.from(replaceInSvg(svgAsString, title, colors));
       Object.keys(sizes).forEach((size) => {
         const imagePath = pathToImage(uuidHash, size);
         svg2Image(buf, imagePath, size);
@@ -136,8 +137,8 @@ function pathToImage(uuidHash: string, size: string): string {
 /**
  * Get a random color from colors enum.
  */
-function randomColor(): string {
-  const items = Object.values(colors);
+function randomColor(colors: Array<CoverColor>): CoverColor {
+  const items = colors || defaultCovers;
   const keys = Object.keys(items);
   const random: number = +keys[Math.floor(Math.random() * keys.length)];
 
@@ -150,8 +151,12 @@ function randomColor(): string {
  * @param svg
  * @param title
  */
-function replaceInSvg(svg: string, title: string): string {
-  const svgColor = randomColor();
+function replaceInSvg(
+  svg: string,
+  title: string,
+  colors: Array<CoverColor>
+): string {
+  const svgColor = randomColor(colors);
   // split string if it is to long
   const lines = splitString(title, 15, 15, 4, 15);
 
@@ -171,7 +176,7 @@ function replaceInSvg(svg: string, title: string): string {
     .join(" ");
   return svg
     .replace("TITLE_TEMPLATE", svgTitle)
-    .replace("COLOR_TEMPLATE", svgColor);
+    .replace("COLOR_TEMPLATE", svgColor.background);
 }
 
 const INVALID_CONSONANT_CONNECTIONS_BEGINNING = new Set([
