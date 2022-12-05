@@ -2,7 +2,7 @@ import fastify from "fastify";
 import { generate, generateArray } from "./svg/svgGenerator";
 import path from "path";
 import { promises as Fs } from "fs";
-import { mapMaterialType, materialTypes, sizes } from "./utils";
+import { CoverColor, mapMaterialType, materialTypes, sizes } from "./utils";
 import { exec } from "child_process";
 // @ts-ignore
 import { log } from "dbc-node-logger";

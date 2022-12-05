@@ -9,7 +9,9 @@ import { log } from "dbc-node-logger";
 import {
   colors as defaultCovers,
   CoverColor,
+  distance,
   encodeXmlSpecialChars,
+  hexToRgb,
   mapMaterialType,
   materialTypes,
   sizes,
@@ -102,7 +104,7 @@ function svg2Image(svgString: Buffer, path: string, size: string): void {
   const timestamp = performance.now();
   sharp(svgString)
     .resize(sizes)
-    .jpeg()
+    .jpeg({ chromaSubsampling: "4:4:4", quality: 80 })
     .toFile(`${path}.jpg`, (err: any, info: any) => {
       const total_ms = performance.now() - timestamp;
       registerDuration(PERFORMANCE_HISTOGRAM_NAME, total_ms);
@@ -137,7 +139,7 @@ function pathToImage(uuidHash: string, size: string): string {
 /**
  * Get a random color from colors enum.
  */
-function randomColor(colors: Array<CoverColor>): CoverColor {
+function randomColor(colors?: Array<CoverColor>): CoverColor {
   const items = colors || defaultCovers;
   const keys = Object.keys(items);
   const random: number = +keys[Math.floor(Math.random() * keys.length)];
@@ -154,11 +156,18 @@ function randomColor(colors: Array<CoverColor>): CoverColor {
 function replaceInSvg(
   svg: string,
   title: string,
-  colors: Array<CoverColor>
+  colors?: Array<CoverColor>
 ): string {
   const svgColor = randomColor(colors);
   // split string if it is to long
   const lines = splitString(title, 15, 15, 4, 15);
+
+  const textColor =
+    svgColor.text ||
+    (distance([0, 0, 0], hexToRgb(svgColor.background)) >
+    distance([255, 255, 255], hexToRgb(svgColor.background))
+      ? "black"
+      : "white");
 
   const largeFont =
     lines.every((line) => line.length <= 11) && lines.length <= 2;
@@ -176,7 +185,8 @@ function replaceInSvg(
     .join(" ");
   return svg
     .replace("TITLE_TEMPLATE", svgTitle)
-    .replace("COLOR_TEMPLATE", svgColor.background);
+    .replace("COLOR_TEMPLATE", svgColor.background)
+    .replace(/FOREGROUND_COLOR/g, textColor);
 }
 
 const INVALID_CONSONANT_CONNECTIONS_BEGINNING = new Set([

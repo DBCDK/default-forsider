@@ -150,3 +150,26 @@ export function mapMaterialType(materialType: string): string {
   }
   return "Default";
 }
+
+/**
+ * Converts hex color to rgb
+ */
+export function hexToRgb(hex: string): Array<number> {
+  return (
+    /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i
+      .exec(hex)
+      ?.slice(1)
+      ?.map((res) => parseInt(res, 16)) || [0, 0, 0]
+  );
+}
+
+/**
+ * Euclidean distance in 3 dimensions
+ */
+export function distance(point1: Array<number>, point2: Array<number>): number {
+  return Math.sqrt(
+    Math.pow(point1[0] - point2[0], 2) +
+      Math.pow(point1[1] - point2[1], 2) +
+      Math.pow(point1[2] - point2[2], 2)
+  );
+}
