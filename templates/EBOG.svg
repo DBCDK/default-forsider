@@ -15,53 +15,14 @@
      height="460"
      fill="COLOR_TEMPLATE"
      id="rect539" />
-  <path
-     d="m 183.00322,66 h -72 v 82 h 72 z m -2,80 h -68 V 68 h 68 z"
-     fill="FOREGROUND_COLOR"
-     id="path541" />
-  <path
-     d="m 101.00322,56 v 112 h 92 V 56 Z m 90,110 h -88 V 58 h 88 z"
-     fill="FOREGROUND_COLOR"
-     id="path543" />
-  <path
-     d="m 147.00322,151 c -3.31,0 -6,2.69 -6,6 0,3.31 2.69,6 6,6 3.31,0 6,-2.69 6,-6 0,-3.31 -2.69,-6 -6,-6 z m 0,10 c -2.21,0 -4,-1.79 -4,-4 0,-2.21 1.79,-4 4,-4 2.21,0 4,1.79 4,4 0,2.21 -1.79,4 -4,4 z"
-     fill="FOREGROUND_COLOR"
-     id="path545" />
-  <rect
-     x="124.50322"
-     y="118.63"
-     width="45"
-     height="2"
-     fill="FOREGROUND_COLOR"
-     id="rect547" />
-  <rect
-     x="124.50322"
-     y="106.13"
-     width="45"
-     height="2"
-     fill="FOREGROUND_COLOR"
-     id="rect549" />
-  <rect
-     x="124.50322"
-     y="93.630005"
-     width="45"
-     height="2"
-     fill="FOREGROUND_COLOR"
-     id="rect551" />
-  <rect
-     x="124.50322"
-     y="81.130005"
-     width="45"
-     height="2"
-     fill="FOREGROUND_COLOR"
-     id="rect553" />
-  <rect
-     x="124.50322"
-     y="131.13"
-     width="45"
-     height="2"
-     fill="FOREGROUND_COLOR"
-     id="rect555" />
+  <path d="M193.2 64.8H106.8V163.2H193.2V64.8ZM190.8 160.8H109.2V67.2H190.8V160.8Z" fill="FOREGROUND_COLOR"/>
+  <path d="M94.7998 52.8V187.2H205.2V52.8H94.7998ZM202.8 184.8H97.1998V55.2H202.8V184.8Z" fill="FOREGROUND_COLOR"/>
+  <path d="M150 166.8C146.028 166.8 142.8 170.028 142.8 174C142.8 177.972 146.028 181.2 150 181.2C153.972 181.2 157.2 177.972 157.2 174C157.2 170.028 153.972 166.8 150 166.8ZM150 178.8C147.348 178.8 145.2 176.652 145.2 174C145.2 171.348 147.348 169.2 150 169.2C152.652 169.2 154.8 171.348 154.8 174C154.8 176.652 152.652 178.8 150 178.8Z" fill="FOREGROUND_COLOR"/>
+  <path d="M177 127.956H123V130.356H177V127.956Z" fill="FOREGROUND_COLOR"/>
+  <path d="M177 112.956H123V115.356H177V112.956Z" fill="FOREGROUND_COLOR"/>
+  <path d="M177 97.956H123V100.356H177V97.956Z" fill="FOREGROUND_COLOR"/>
+  <path d="M177 82.956H123V85.356H177V82.956Z" fill="FOREGROUND_COLOR"/>
+  <path d="M177 142.956H123V145.356H177V142.956Z" fill="FOREGROUND_COLOR"/>
   <line
      x1="125"
      y1="227"
