@@ -96,7 +96,7 @@ const materialTypeMap = {
     "tidsskrift (net)",
   ],
   Artikel: ["tidsskriftsartikel", "avisartikel", "artikel", "anmeldelse"],
-  //Podcast = "PODCAST",
+  Podcast: ["lyd (podcast"],
   Film: [
     "film",
     "blu-ray",
