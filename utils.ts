@@ -99,6 +99,7 @@ const materialTypeMap = {
   Podcast: ["lyd (podcast"],
   Film: [
     "film",
+    "dvd",
     "blu-ray",
     "blu-ray 4k",
     "film (net)",
@@ -111,7 +112,7 @@ const materialTypeMap = {
     "musik",
     "bånd",
     "grammofonplade",
-    "dvd",
+    "dvd (musik)",
     "cd (musik)",
     "musik (net)",
   ],
