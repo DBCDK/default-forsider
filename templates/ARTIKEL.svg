@@ -15,88 +15,17 @@
             height="460"
             fill="COLOR_TEMPLATE"
             id="rect230"/>
-    <path
-            d="m 191.7578,173.19977 h -84.65 V 56.535768 h 84.65 z m -82.65,-2.09244 h 80.65 V 58.628208 h -80.65 z"
-            fill="FOREGROUND_COLOR"
-            id="path232"
-            style="stroke-width:1.02285"/>
-    <path
-            d="m 145.7478,105.70812 h -25.07 V 72.229069 h 25.07 z m -23.07,-2.09245 h 21.07 V 74.321509 h -21.07 z"
-            fill="FOREGROUND_COLOR"
-            id="path234"
-            style="stroke-width:1.02285"/>
-    <rect
-            x="155.7578"
-            y="103.61568"
-            width="25"
-            height="2.0924401"
-            fill="FOREGROUND_COLOR"
-            id="rect236"
-            style="stroke-width:1.02285"/>
-    <rect
-            x="155.7578"
-            y="87.922379"
-            width="25"
-            height="2.0924401"
-            fill="FOREGROUND_COLOR"
-            id="rect238"
-            style="stroke-width:1.02285"/>
-    <rect
-            x="155.7578"
-            y="72.22908"
-            width="25"
-            height="2.0924401"
-            fill="FOREGROUND_COLOR"
-            id="rect240"
-            style="stroke-width:1.02285"/>
-    <rect
-            x="120.7578"
-            y="119.30898"
-            width="25"
-            height="2.0924401"
-            fill="FOREGROUND_COLOR"
-            id="rect242"
-            style="stroke-width:1.02285"/>
-    <rect
-            x="120.7578"
-            y="135.00227"
-            width="25"
-            height="2.0924401"
-            fill="FOREGROUND_COLOR"
-            id="rect244"
-            style="stroke-width:1.02285"/>
-    <rect
-            x="120.7578"
-            y="150.69557"
-            width="25"
-            height="2.0924401"
-            fill="FOREGROUND_COLOR"
-            id="rect246"
-            style="stroke-width:1.02285"/>
-    <rect
-            x="155.7578"
-            y="119.30898"
-            width="25"
-            height="2.0924401"
-            fill="FOREGROUND_COLOR"
-            id="rect248"
-            style="stroke-width:1.02285"/>
-    <rect
-            x="155.7578"
-            y="135.00227"
-            width="25"
-            height="2.0924401"
-            fill="FOREGROUND_COLOR"
-            id="rect250"
-            style="stroke-width:1.02285"/>
-    <rect
-            x="155.7578"
-            y="150.69557"
-            width="25"
-            height="2.0924401"
-            fill="FOREGROUND_COLOR"
-            id="rect252"
-            style="stroke-width:1.02285"/>
+    <path d="M199.2 186.912H97.6201V53.1H199.2V186.912ZM100.02 184.512H196.8V55.5H100.02V184.512V184.512Z" fill="FOREGROUND_COLOR"/>
+    <path d="M143.988 109.5H113.904V71.1H143.988V109.5ZM116.304 107.1H141.588V73.5H116.304V107.1Z" fill="FOREGROUND_COLOR"/>
+    <path d="M186 107.1H156V109.5H186V107.1Z" fill="FOREGROUND_COLOR"/>
+    <path d="M186 89.1H156V91.5H186V89.1Z" fill="FOREGROUND_COLOR"/>
+    <path d="M186 71.1H156V73.5H186V71.1Z" fill="FOREGROUND_COLOR"/>
+    <path d="M144 125.1H114V127.5H144V125.1Z" fill="FOREGROUND_COLOR"/>
+    <path d="M144 143.1H114V145.5H144V143.1Z" fill="FOREGROUND_COLOR"/>
+    <path d="M144 161.1H114V163.5H144V161.1Z" fill="FOREGROUND_COLOR"/>
+    <path d="M186 125.1H156V127.5H186V125.1Z" fill="FOREGROUND_COLOR"/>
+    <path d="M186 143.1H156V145.5H186V143.1Z" fill="FOREGROUND_COLOR"/>
+    <path d="M186 161.1H156V163.5H186V161.1Z" fill="FOREGROUND_COLOR"/>
     <line
             x1="125"
             y1="227"
