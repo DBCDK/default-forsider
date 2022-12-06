@@ -183,7 +183,7 @@ function replaceInSvg(
 
   const lineHeight = largeFont ? 50 : 38;
   const fontSize = largeFont ? 39 : 30;
-  const textY = 345 - (lineHeight * lines.length) / 2 - (lineHeight - fontSize);
+  const textY = 330 - (lineHeight * lines.length) / 2 - (lineHeight - fontSize);
 
   // insert each part of string in <tspan> element
   const svgTitle = `<text id="title" x="50%" y="${textY}px" dominant-baseline="center" text-anchor="middle" fill="${textColor}"
