@@ -74,6 +74,7 @@ const materialTypeMap = {
     "graphic novel",
     "bog stor skrift",
     "tegneserie (net)",
+    "diskette",
   ],
   Lydbog: [
     "lyd (cd)",
@@ -96,7 +97,7 @@ const materialTypeMap = {
     "tidsskrift (net)",
   ],
   Artikel: ["tidsskriftsartikel", "avisartikel", "artikel", "anmeldelse"],
-  Podcast: ["lyd (podcast"],
+  Podcast: ["lyd (podcast)"],
   Film: [
     "film",
     "dvd",
@@ -133,7 +134,6 @@ const materialTypeMap = {
     "wii",
     "playstation 2",
     "xbox",
-    "diskette",
   ],
   Brætspil: ["spil"],
 };
