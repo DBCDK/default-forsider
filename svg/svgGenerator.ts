@@ -181,18 +181,22 @@ function replaceInSvg(
   let fontSize: number;
   let lines;
 
-  if (maxWordLength > 15) {
-    lineHeight = 36;
-    fontSize = 21;
-    lines = splitString(title, 22, 22, 4, 22);
-  } else if (maxWordLength > 11) {
-    lineHeight = 36;
-    fontSize = 30;
-    lines = splitString(title, 15, 15, 4, 15);
-  } else {
+  if (maxWordLength <= 11) {
     lineHeight = 50;
     fontSize = 39;
     lines = splitString(title, 11, 11, 3, 11);
+  }
+
+  if (maxWordLength <= 15 || lines?.[lines.length - 1].endsWith("...")) {
+    lineHeight = 36;
+    fontSize = 30;
+    lines = splitString(title, 15, 15, 4, 15);
+  }
+
+  if (!lines || lines?.[lines.length - 1].endsWith("...")) {
+    lineHeight = 36;
+    fontSize = 21;
+    lines = splitString(title, 22, 22, 4, 22);
   }
 
   const textY = 330 - (lineHeight * lines.length) / 2 - (lineHeight - fontSize);
