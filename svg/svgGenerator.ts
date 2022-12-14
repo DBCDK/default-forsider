@@ -168,8 +168,6 @@ function replaceInSvg(
       .map((str) => str.trim().length)
   );
 
-  console.log({ maxWordLength }, title);
-
   const textColor =
     svgColor.text ||
     (distance([0, 0, 0], hexToRgb(svgColor.background)) >
@@ -177,9 +175,9 @@ function replaceInSvg(
       ? "black"
       : "white");
 
-  let lineHeight: number;
-  let fontSize: number;
-  let lines;
+  let lineHeight: number = 0;
+  let fontSize: number = 0;
+  let lines = null;
 
   if (maxWordLength <= 11) {
     lineHeight = 50;
