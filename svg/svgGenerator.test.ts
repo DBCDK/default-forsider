@@ -3,7 +3,7 @@ import { canSplitAtPos, splitString } from "./svgGenerator";
 test("very long word", () => {
   const longTitle = "dethererenmagetlangstrengpåover22tegn";
   const actual = splitString(longTitle, 10, 15, 4);
-  const expected = ["dethereren-", "magetlangs-", "trengpåove-", "r22tegn"];
+  const expected = ["dethererenmaget-", "langstrengpåove-", "r22tegn"];
   expect(actual).toEqual(expected);
 });
 
@@ -15,7 +15,7 @@ test("very very long word", () => {
     "dethererenmaget-",
     "langstrengpåove-",
     "r22tegndetherer-",
-    "enmagetlang...",
+    "enmagetlangst...",
   ];
   expect(actual).toEqual(expected);
 });
@@ -27,9 +27,9 @@ test("very long title with very long word in the end", () => {
   const actual = splitString(longTitle, 10, 15, 4);
   const expected = [
     "Harry potter og",
-    "hemmeligheder-",
-    "nes kammer deth-",
-    "ererenmagetla...",
+    "hemmelighederne-",
+    "s kammer",
+    "dethererenmag...",
   ];
 
   expect(actual).toEqual(expected);
@@ -40,7 +40,7 @@ test("very long title with very long word in the end, two lines", () => {
     "Harry potter og hemmelighedernes kammer dethererenmagetlangstrengpåover22tegn";
 
   const actual = splitString(longTitle, 10, 15, 2);
-  const expected = ["Harry potter og", "hemmelighed..."];
+  const expected = ["Harry potter og", "hemmeligheder..."];
 
   expect(actual).toEqual(expected);
 });
@@ -52,24 +52,6 @@ test("short title is on single line", () => {
   const expected = ["Harry pot-", "ter og hem-", "meligheder-", "nes kammer"];
 
   expect(actual).toEqual(["Gormenghast"]);
-});
-
-test("long title is split and hyphens added", () => {
-  const longTitle = "Harry potter og hemmelighedernes kammer";
-
-  const actual = splitString(longTitle, 10, 10, 4);
-  const expected = ["Harry pot-", "ter og hem-", "meligheder-", "nes kammer"];
-
-  expect(actual).toEqual(expected);
-});
-
-test("split on space, will not add hyphen", () => {
-  const longTitle = "Harry potter og hemmelighedernes kammer";
-
-  const actual = splitString(longTitle, 15, 15, 4);
-  const expected = ["Harry potter og", "hemmeligheder-", "nes kammer"];
-
-  expect(actual).toEqual(expected);
 });
 
 test("Seen in the wild", () => {
@@ -85,8 +67,8 @@ test("Seen in the wild", () => {
 
   expect(splitString("Miljøforskere blah at milliarder", 15, 15, 4)).toEqual([
     "Miljøforskere",
-    "blah at milli-",
-    "arder",
+    "blah at",
+    "milliarder",
   ]);
 
   expect(
@@ -100,7 +82,7 @@ test("Seen in the wild", () => {
 
   expect(
     splitString("harry potter og hemmlighedernes kammer", 15, 15, 4, 15)
-  ).toEqual(["harry potter og", "hemmligheder-", "nes kammer"]);
+  ).toEqual(["harry potter og", "hemmlighedernes", "kammer"]);
 
   // Prefer to split at "-"
   expect(
@@ -111,9 +93,8 @@ test("Seen in the wild", () => {
       4,
       15
     )
-  ).toEqual(["Historiens", "største e-", "sportssatsning", "kan flo..."]);
+  ).toEqual(["Historiens", "største e-", "sportssatsning", "kan floppe fælt"]);
 });
-
 test("rules for word splitting", () => {
   expect(canSplitAtPos("målingerne", 1)).toEqual(false); // m-ålingerne - Der er ingen vokal på venstre side + mindst 3 karakterer
   expect(canSplitAtPos("målingerne", 2)).toEqual(false); // må-lingerne - Vi vil have mindst 3 karakterer på hver side

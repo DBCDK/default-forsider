@@ -161,8 +161,14 @@ function replaceInSvg(
   colors?: Array<CoverColor>
 ): string {
   const svgColor = randomColor(colors);
-  // split string if it is to long
-  const linesNarrow = splitString(title, 11, 11, 4, 11);
+
+  const maxWordLength = Math.max(
+    ...title
+      ?.split(/(.*?[$&+,:;=?@#|\/'<>.^*()%!-\s])/g)
+      .map((str) => str.trim().length)
+  );
+
+  console.log({ maxWordLength }, title);
 
   const textColor =
     svgColor.text ||
@@ -171,18 +177,23 @@ function replaceInSvg(
       ? "black"
       : "white");
 
-  let largeFont = false;
+  let lineHeight: number;
+  let fontSize: number;
   let lines;
-  if (linesNarrow.length <= 3) {
-    largeFont = true;
-    lines = linesNarrow;
+  if (maxWordLength > 15) {
+    lineHeight = 36;
+    fontSize = 21;
+    lines = splitString(title, 22, 22, 4, 22);
+  } else if (maxWordLength > 11) {
+    lineHeight = 36;
+    fontSize = 30;
+    lines = splitString(title, 15, 15, 4, 15);
   } else {
-    const linesWide = splitString(title, 15, 15, 4, 15);
-    lines = linesWide;
+    lineHeight = 50;
+    fontSize = 39;
+    lines = splitString(title, 11, 11, 4, 11);
   }
 
-  const lineHeight = largeFont ? 50 : 38;
-  const fontSize = largeFont ? 39 : 30;
   const textY = 330 - (lineHeight * lines.length) / 2 - (lineHeight - fontSize);
 
   // insert each part of string in <tspan> element
@@ -951,7 +962,7 @@ export function canSplitAtPos(
 
   return true;
 }
-
+const BREAK_POINTS = "[]$&+,:;=?@#|/'<>.^*()%!- ";
 export function splitString(
   longTitle: string,
   minWidth: number,
@@ -961,48 +972,37 @@ export function splitString(
 ): Array<string> {
   const res = [];
 
-  // Try to divide characters evenly on four lines
-  let width;
-  if (longTitle.length <= maxWidth) {
-    // Fits on one line
-    width = maxWidth;
-  } else if (longTitle.length / maxLines <= maxWidth) {
-    // Fits on four lines, try to equal amount of characters per line
-    width = Math.max(minWidth, Math.round(longTitle.length / maxLines));
-  } else {
-    // Exceeds four lines
-    width = maxWidth;
-  }
-
   // Loop through the long title
   let i = 0;
   while (i < longTitle.length) {
     // Jump to the current position + the calculated width
     // And then move back, until a valid split position is found
-    let validSplitPos = i + width;
+    let validSplitPos = i + maxWidth;
     let addHyphen = false;
+    let performSecondPass = true;
+
+    // First check if we have to break at a break point
     for (let j = validSplitPos; j > i; j--) {
-      if (longTitle.charAt(j) === "") {
-        // the end
-        break;
-      }
-      if (longTitle.charAt(j) === "-") {
-        // This is -, we can break line without hyphen
+      if (BREAK_POINTS.includes(longTitle.charAt(j))) {
         validSplitPos = j + 1;
-        break;
-      }
-      if (longTitle.charAt(j) === " ") {
-        // This is a space we can break line without hyphen
-        validSplitPos = j;
-        break;
-      } else if (canSplitAtPos(longTitle, j, wordSplitThreshold)) {
-        // Found a position inside a word, where its ok to break
-        // and we add a hyphen
-        validSplitPos = j;
-        addHyphen = true;
+        performSecondPass = false;
         break;
       }
     }
+
+    if (performSecondPass) {
+      addHyphen = true;
+      // for (let j = validSplitPos; j > i; j--) {
+      //   if (canSplitAtPos(longTitle, j, wordSplitThreshold)) {
+      //     // Found a position inside a word, where its ok to break
+      //     // and we add a hyphen
+      //     validSplitPos = j;
+      //     addHyphen = true;
+      //     break;
+      //   }
+      // }
+    }
+
     res.push(longTitle.slice(i, validSplitPos) + (addHyphen ? "-" : ""));
 
     // Set the next offset, to the found valid position
