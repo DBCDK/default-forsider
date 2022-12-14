@@ -180,6 +180,7 @@ function replaceInSvg(
   let lineHeight: number;
   let fontSize: number;
   let lines;
+
   if (maxWordLength > 15) {
     lineHeight = 36;
     fontSize = 21;
@@ -191,7 +192,7 @@ function replaceInSvg(
   } else {
     lineHeight = 50;
     fontSize = 39;
-    lines = splitString(title, 11, 11, 4, 11);
+    lines = splitString(title, 11, 11, 3, 11);
   }
 
   const textY = 330 - (lineHeight * lines.length) / 2 - (lineHeight - fontSize);
