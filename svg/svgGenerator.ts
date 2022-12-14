@@ -163,7 +163,7 @@ function replaceInSvg(
   const svgColor = randomColor(colors);
 
   const maxWordLength = Math.max(
-    ...title?.split(/(.*?[\s:;,|])/g).map((str) => str.trim().length)
+    ...title?.split(/(.*?[\s:;,|-])/g).map((str) => str.trim().length)
   );
 
   const textColor =
@@ -964,7 +964,7 @@ export function canSplitAtPos(
   return true;
 }
 // const BREAK_POINTS = "[]$&+,:;=?@#|/'<>.^*()%!- ";
-const BREAK_POINTS = " :;,|";
+const BREAK_POINTS = " :;,|-";
 
 export function splitString(
   longTitle: string,
