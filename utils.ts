@@ -64,7 +64,6 @@ export function encodeXmlSpecialChars(stringToEscape: string): string {
 
 /* @TODO - more materialtypes .. [dias, plakat, teateropførelse, cd rom, billede, sang, elektronisk materiale (cd), laborativt materiale, grafisk blad]*/
 const materialTypeMap = {
-  Puslespil: ["puslespil"],
   Bog: [
     "punktskrift",
     "bog",
