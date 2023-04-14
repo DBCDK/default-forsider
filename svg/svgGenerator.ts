@@ -61,7 +61,14 @@ export function generate(query: ICovers): IReturnCover {
       const buf = Buffer.from(replaceInSvg(svgAsString, title, colors));
       Object.keys(sizes).forEach((size) => {
         const imagePath = pathToImage(uuidHash, size);
-        svg2Image(buf, imagePath, size);
+        try {
+          svg2Image(buf, imagePath, size);
+        } catch (e: any) {
+          log.error("Bad image generation", {
+            message: e.message,
+            path: imagePath,
+          });
+        }
       });
     });
   }
