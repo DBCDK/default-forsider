@@ -111,9 +111,10 @@ function svg2Image(svgString: Buffer, path: string, size: string): void {
   const sizes =
     size === "large" ? { width: 300, height: 460 } : { width: 75, height: 115 };
   const timestamp = performance.now();
+
   sharp(svgString)
     .resize(sizes)
-    .jpeg({ chromaSubsampling: "4:4:4", quality: 80 })
+    .jpeg()
     .toFile(`${path}.jpg`, (err: any, info: any) => {
       const total_ms = performance.now() - timestamp;
       registerDuration(PERFORMANCE_HISTOGRAM_NAME, total_ms);
