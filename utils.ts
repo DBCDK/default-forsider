@@ -84,8 +84,10 @@ const materialTypeMap = {
     "lydbog (bånd)",
     "lydbog (cd-mp3)",
     "lyd",
+    "lydbog (online)",
+
   ],
-  Ebog: ["ebog"],
+  Ebog: ["ebog", "e-bog"],
   Tidsskrift: [
     "tidsskrift",
     "periodikum",
@@ -95,7 +97,7 @@ const materialTypeMap = {
     "periodikum (net)",
     "tidsskrift (net)",
   ],
-  Artikel: ["tidsskriftsartikel", "avisartikel", "artikel", "anmeldelse"],
+  Artikel: ["tidsskriftsartikel", "avisartikel", "artikel", "anmeldelse","artikel (online)"],
   Podcast: ["lyd (podcast)"],
   Film: [
     "film",
@@ -106,6 +108,11 @@ const materialTypeMap = {
     "blu-ray 3d",
     "video",
     "biograffilm",
+    "film (dvd)",
+    "film (blu-ray)",
+    "film (online)",
+    "film (blu-ray 4K)",
+    "film (videobånd)",
   ],
   //"Tv-serie" = "TVSERIE", /* Dækker alle varianter (eksempelvis blue-ray, dvd, video) og også online (net, online) */
   Musik: [
@@ -115,6 +122,7 @@ const materialTypeMap = {
     "dvd (musik)",
     "cd (musik)",
     "musik (net)",
+    "musik (online)",
   ],
   Node: ["node"],
   Computerspil: [
