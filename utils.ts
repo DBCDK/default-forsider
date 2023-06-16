@@ -87,7 +87,7 @@ const materialTypeMap = {
     "lydbog (cd-mp3)",
     "lyd",
     "lydbog (online)",
-
+    "bog (elektronisk)",
   ],
   Ebog: ["ebog", "e-bog"],
   Tidsskrift: [
@@ -117,6 +117,7 @@ const materialTypeMap = {
     "film (blu-ray 4K)",
     "film (blu-ray 4k)",
     "film (blu-ray 3D)",
+    "film (blu-ray 3d)",
     "film (videobånd)",
   ],
   //"Tv-serie" = "TVSERIE", /* Dækker alle varianter (eksempelvis blue-ray, dvd, video) og også online (net, online) */
@@ -148,8 +149,9 @@ const materialTypeMap = {
     "playstation 2",
     "xbox",
     "computerspil",
+    "gameboy advance",
   ],
-  Brætspil: ["spil"],
+  Brætspil: ["spil", "brætspil",],
 };
 
 export function mapMaterialType(materialType: string): string {
