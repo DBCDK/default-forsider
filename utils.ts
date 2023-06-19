@@ -119,6 +119,8 @@ const materialTypeMap = {
     "film (blu-ray 3D)",
     "film (blu-ray 3d)",
     "film (videobånd)",
+    "film (spole)",
+    "film (elektronisk)",
   ],
   //"Tv-serie" = "TVSERIE", /* Dækker alle varianter (eksempelvis blue-ray, dvd, video) og også online (net, online) */
   Musik: [
@@ -130,6 +132,8 @@ const materialTypeMap = {
     "musik (net)",
     "musik (online)",
     "musik (dvd)",
+    "musik (blu-ray)",
+    "musik (videobånd)",
   ],
   Node: ["node"],
   Computerspil: [
