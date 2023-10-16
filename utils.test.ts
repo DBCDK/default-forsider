@@ -1,4 +1,8 @@
-import { encodeXmlSpecialChars, mapMaterialType } from "./utils";
+import {
+  encodeXmlSpecialChars,
+  GeneralMaterialTypeCode,
+  mapMaterialType,
+} from "./utils";
 
 test("escape ampersand", () => {
   const weirdtitle = "Hest & pony : pleje & pasning";
@@ -15,22 +19,8 @@ test("escape all specialchars", () => {
 });
 
 test("map MaterialTypes", () => {
-  const matType = "lydbog (net)";
+  const matType = GeneralMaterialTypeCode.PODCASTS;
   const actual = mapMaterialType(matType);
-  const expected = "Lydbog";
-  expect(actual).toEqual(expected);
-});
-
-test("map MaterialTypes", () => {
-  const matType = "fisk";
-  const actual = mapMaterialType(matType);
-  const expected = "Default";
-  expect(actual).toEqual(expected);
-});
-
-test("map MaterialTypes", () => {
-  const matType = "årbog";
-  const actual = mapMaterialType(matType);
-  const expected = "Tidsskrift";
+  const expected = "PODCAST";
   expect(actual).toEqual(expected);
 });

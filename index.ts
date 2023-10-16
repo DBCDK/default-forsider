@@ -2,7 +2,12 @@ import fastify from "fastify";
 import { generate, generateArray } from "./svg/svgGenerator";
 import path from "path";
 import { promises as Fs } from "fs";
-import { CoverColor, mapMaterialType, materialTypes, sizes } from "./utils";
+import {
+  CoverColor,
+  GeneralMaterialTypeCode,
+  mapMaterialType,
+  sizes,
+} from "./utils";
 import { exec } from "child_process";
 // @ts-ignore
 import { log } from "dbc-node-logger";
@@ -157,8 +162,12 @@ export function checkRequest(query: ICovers): IRequestStatus {
   }
 
   const mappedMaterialType: string = mapMaterialType(materialType);
+
   // check materialtype
-  let found = Object.keys(materialTypes).indexOf(mappedMaterialType);
+  let found = Object.values<string>(GeneralMaterialTypeCode).indexOf(
+    mappedMaterialType
+  );
+
   requestStatus.status = found !== -1;
   if (!requestStatus.status) {
     requestStatus.message = "not supported materialType:" + materialType;
@@ -172,7 +181,7 @@ export function checkRequest(query: ICovers): IRequestStatus {
  */
 export interface ICovers {
   title: string;
-  materialType: materialTypes;
+  materialType: GeneralMaterialTypeCode;
   colors?: Array<CoverColor>;
 }
 
