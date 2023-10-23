@@ -12,7 +12,7 @@ export enum GeneralMaterialTypeCode {
   NEWSPAPER_JOURNALS = "TIDSSKRIFT",
   OTHER = "DEFAULT",
   PODCASTS = "PODCAST",
-  SHEET_MUSIC = "NODER",
+  SHEET_MUSIC = "NODE",
   TV_SERIES = "DEFAULT",
 }
 
