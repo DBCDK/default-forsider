@@ -19,7 +19,7 @@ test("escape all specialchars", () => {
 });
 
 test("map MaterialTypes", () => {
-  const matType = GeneralMaterialTypeCode.PODCASTS;
+  const matType = "PODCASTS";
   const actual = mapMaterialType(matType);
   const expected = "PODCAST";
   expect(actual).toEqual(expected);

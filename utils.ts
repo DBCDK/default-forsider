@@ -64,7 +64,7 @@ export function encodeXmlSpecialChars(stringToEscape: string): string {
  * @file - mapping for materialTypes - mostly for default forside service
  */
 
-export function mapMaterialType(materialType: GeneralMaterialTypeCode): string {
+export function mapMaterialType(materialType: string): string {
   const key: number = Object.keys(GeneralMaterialTypeCode).indexOf(
     materialType
   );
