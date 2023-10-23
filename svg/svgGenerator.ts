@@ -13,7 +13,6 @@ import {
   encodeXmlSpecialChars,
   hexToRgb,
   mapMaterialType,
-  materialTypes,
   sizes,
 } from "../utils";
 import { ICovers, ICoversArray, checkRequest } from "../index";
@@ -39,6 +38,7 @@ export function generate(query: ICovers): IReturnCover {
   const { title, materialType, colors } = query;
 
   const mappedMaterial: string = mapMaterialType(materialType);
+
   // we need to generate same hash each time - use 'uuid-by-string' @see https://www.npmjs.com/package/uuid-by-string
   const getUuid = require("uuid-by-string");
 
@@ -162,6 +162,7 @@ function randomColor(colors?: Array<CoverColor>): CoverColor {
  * Handle and insert title af cover.
  * @param svg
  * @param title
+ * @param colors
  */
 function replaceInSvg(
   svg: string,
@@ -1036,13 +1037,10 @@ export function splitString(
  */
 async function read(materialType: string): Promise<string> {
   try {
-    // get materialtype value from materialTypes enum
-    const index: number = Object.keys(materialTypes).indexOf(
-      _.upperFirst(materialType)
-    );
-    const matType = Object.values(materialTypes)[index];
     // read the template
-    return await Fs.readFile(`templates/${matType}.svg`, { encoding: "utf8" });
+    return await Fs.readFile(`templates/${materialType}.svg`, {
+      encoding: "utf8",
+    });
   } catch (e) {
     console.log(`Read  failed:`, {
       error: String(e),
