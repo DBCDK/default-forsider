@@ -7,11 +7,14 @@ import { exec } from "child_process";
 // @ts-ignore
 import { log } from "dbc-node-logger";
 import { getMetrics, initHistogram, registerDuration } from "./monitor";
+import { createVerifier } from "fast-jwt";
 
 const _ = require("lodash");
 const server = fastify({ maxParamLength: 2000 });
 const upSince = new Date();
 export const workingDirectory = process.env.IMAGE_DIR || "HEST";
+
+const jwtDecoder = createVerifier({ key: process.env.DEFAULT_FORSIDER_KEY });
 
 /**
  * Check if working directories for storing images are in place
@@ -131,9 +134,7 @@ async function waitForFile(path: string) {
 
 function decode(uid: string) {
   try {
-    const decoded = JSON.parse(
-      Buffer.from(decodeURIComponent(uid), "base64").toString()
-    );
+    const decoded = jwtDecoder(uid);
     return generate(decoded);
   } catch (e) {
     return null;
@@ -141,9 +142,8 @@ function decode(uid: string) {
 }
 
 // New way of accessing images. Created on the fly from a base64 encoded string.
-server.get(
-  `/${workingDirectory}/large/:uid`,
-  async function (request: any, reply: any) {
+server.get(`/large/:uid`, async function (request: any, reply: any) {
+  try {
     const { uid } = request.params;
     const { detail }: any = decode(uid);
     const imagePath = `images/${detail}`;
@@ -151,13 +151,14 @@ server.get(
     const res = await Fs.readFile(imagePath);
     reply.type("image/jpg");
     reply.code(200).send(res);
+  } catch (e) {
+    reply.code(404).send("Not found");
   }
-);
+});
 
 // New way of accessing images. Created on the fly from a base64 encoded string.
-server.get(
-  `/${workingDirectory}/thumbnail/:uid`,
-  async function (request: any, reply: any) {
+server.get(`/thumbnail/:uid`, async function (request: any, reply: any) {
+  try {
     const { uid } = request.params;
     const { thumbNail }: any = decode(uid);
     const imagePath = `images/${thumbNail}`;
@@ -165,14 +166,16 @@ server.get(
     const res = await Fs.readFile(imagePath);
     reply.type("image/jpg");
     reply.code(200).send(res);
+  } catch (e) {
+    reply.code(404).send("Not found");
   }
-);
+});
 
 server.addHook("onRequest", async (request, reply) => {
   // We should have a better way of identifying file access
   if (
-    (request.url.includes("/images") && request.url.includes("/large")) ||
-    request.url.includes("/thumbnail")
+    request.url.includes("/images") &&
+    (request.url.includes("/large") || request.url.includes("/thumbnail"))
   ) {
     const now = performance.now();
     await waitForFile(request.url);
