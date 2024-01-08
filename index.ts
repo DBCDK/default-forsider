@@ -141,7 +141,7 @@ function decode(uid: string) {
   }
 }
 
-// New way of accessing images. Created on the fly from a base64 encoded string.
+// New way of accessing images. Created on the fly from a signed jwt
 server.get(`/large/:uid`, async function (request: any, reply: any) {
   try {
     const { uid } = request.params;
@@ -156,7 +156,7 @@ server.get(`/large/:uid`, async function (request: any, reply: any) {
   }
 });
 
-// New way of accessing images. Created on the fly from a base64 encoded string.
+// New way of accessing images. Created on the fly from a signed jwt
 server.get(`/thumbnail/:uid`, async function (request: any, reply: any) {
   try {
     const { uid } = request.params;
