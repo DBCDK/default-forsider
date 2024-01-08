@@ -36,6 +36,7 @@ interface IReturnCover {
  */
 export function generate(query: ICovers): IReturnCover {
   const { title, materialType, colors } = query;
+  console.log("gen it");
 
   const mappedMaterial: string = mapMaterialType(materialType);
 
@@ -1031,16 +1032,24 @@ export function splitString(
   return res.slice(0, maxLines).map((line) => line.trim());
 }
 
+const templateCache: any = {};
 /**
  * helper function to read the (svg) file.
  * @returns {Promise<string>} | String
  */
 async function read(materialType: string): Promise<string> {
   try {
+    if (templateCache[materialType]) {
+      if (templateCache[materialType].then) {
+        return await templateCache[materialType];
+      }
+      return templateCache[materialType];
+    }
     // read the template
-    return await Fs.readFile(`templates/${materialType}.svg`, {
+    templateCache[materialType] = Fs.readFile(`templates/${materialType}.svg`, {
       encoding: "utf8",
     });
+    return await templateCache[materialType];
   } catch (e) {
     console.log(`Read  failed:`, {
       error: String(e),
