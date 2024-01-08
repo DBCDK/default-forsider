@@ -36,7 +36,6 @@ interface IReturnCover {
  */
 export function generate(query: ICovers): IReturnCover {
   const { title, materialType, colors } = query;
-  console.log("gen it");
 
   const mappedMaterial: string = mapMaterialType(materialType);
 
