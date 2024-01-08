@@ -7,7 +7,7 @@
     "build": "tsc -p tsconfig.json",
     "start": "node index.js",
     "dev": "DEFAULT_FORSIDER_KEY=secret ts-node-dev --respawn --transpile-only ./*.ts",
-    "test": "jest"
+    "test": "DEFAULT_FORSIDER_KEY=secret jest"
   },
   "repository": {
     "type": "git",
