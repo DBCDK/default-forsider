@@ -2,27 +2,25 @@ import fastify from "fastify";
 import { generate, generateArray } from "./svg/svgGenerator";
 import path from "path";
 import { promises as Fs } from "fs";
-import {
-  CoverColor,
-  GeneralMaterialTypeCode,
-  mapMaterialType,
-  sizes,
-} from "./utils";
+import { CoverColor, GeneralMaterialTypeCode, mapMaterialType } from "./utils";
 import { exec } from "child_process";
 // @ts-ignore
 import { log } from "dbc-node-logger";
 import { getMetrics, initHistogram, registerDuration } from "./monitor";
+import { createVerifier } from "fast-jwt";
 
 const _ = require("lodash");
-const server = fastify();
+const server = fastify({ maxParamLength: 2000 });
 const upSince = new Date();
 export const workingDirectory = process.env.IMAGE_DIR || "HEST";
+
+const jwtDecoder = createVerifier({ key: process.env.DEFAULT_FORSIDER_KEY });
 
 /**
  * Check if working directories for storing images are in place
  */
 async function checkDirectories() {
-  const good = await fileExists(`/${workingDirectory}`);
+  const good = await fileExists(`images/${workingDirectory}`);
   if (!good) {
     await Fs.mkdir(`images/${workingDirectory}`);
     await Fs.mkdir(`images/${workingDirectory}/large`);
@@ -110,7 +108,7 @@ function delay(ms: number) {
 
 async function fileExists(path: string): Promise<boolean> {
   try {
-    await Fs.access("./images" + path);
+    await Fs.access(path);
     return true;
   } catch (error) {
     return false;
@@ -134,9 +132,51 @@ async function waitForFile(path: string) {
   // TODO monitor this
 }
 
+function decode(uid: string) {
+  try {
+    const decoded = jwtDecoder(uid);
+    return generate(decoded);
+  } catch (e) {
+    return null;
+  }
+}
+
+// New way of accessing images. Created on the fly from a signed jwt
+server.get(`/large/:uid`, async function (request: any, reply: any) {
+  try {
+    const { uid } = request.params;
+    const { detail }: any = decode(uid);
+    const imagePath = `images/${detail}`;
+    await waitForFile(imagePath);
+    const res = await Fs.readFile(imagePath);
+    reply.type("image/jpg");
+    reply.code(200).send(res);
+  } catch (e) {
+    reply.code(404).send("Not found");
+  }
+});
+
+// New way of accessing images. Created on the fly from a signed jwt
+server.get(`/thumbnail/:uid`, async function (request: any, reply: any) {
+  try {
+    const { uid } = request.params;
+    const { thumbNail }: any = decode(uid);
+    const imagePath = `images/${thumbNail}`;
+    await waitForFile(imagePath);
+    const res = await Fs.readFile(imagePath);
+    reply.type("image/jpg");
+    reply.code(200).send(res);
+  } catch (e) {
+    reply.code(404).send("Not found");
+  }
+});
+
 server.addHook("onRequest", async (request, reply) => {
   // We should have a better way of identifying file access
-  if (request.url.includes("/large") || request.url.includes("/thumbnail")) {
+  if (
+    request.url.includes("/images") &&
+    (request.url.includes("/large") || request.url.includes("/thumbnail"))
+  ) {
     const now = performance.now();
     await waitForFile(request.url);
     registerDuration(PERFORMANCE_WAIT_FOR_IMAGE, performance.now() - now);
