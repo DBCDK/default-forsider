@@ -22,8 +22,8 @@ pipeline {
         SONAR_SCANNER_HOME = tool 'SonarQube Scanner from Maven Central'
         SONAR_SCANNER = "$SONAR_SCANNER_HOME/bin/sonar-scanner"
         SONAR_PROJECT_KEY = "fe-bib-default-forsider"
-        SONAR_SOURCES='/'
-        SONAR_TESTS='/'
+        SONAR_SOURCES=''
+        SONAR_TESTS=''
     }
     stages {
         stage('clean workspace') {
