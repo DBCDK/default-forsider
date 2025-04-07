@@ -26,6 +26,12 @@ pipeline {
         SONAR_TESTS=''
     }
     stages {
+        stage('clean workspace') {
+            steps {
+                cleanWs()
+                checkout scm
+            }
+        }
         stage("SonarQube") {
             steps {
                 withSonarQubeEnv(installationName: 'sonarqube.dbc.dk') {
