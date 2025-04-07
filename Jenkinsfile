@@ -18,6 +18,9 @@ pipeline {
         REPOSITORY = "https://docker-frontend.artifacts.dbccloud.dk"
         // image: eg. "default-forside-service:34" OR "default-forside-service-[branch_name]:453"
         IMAGE = "default-forside-service${BRANCH_NAME != 'main' ? "-${BRANCH_NAME.toLowerCase()}" : ''}:${BUILD_NUMBER}"
+
+        SONAR_SCANNER_HOME = tool 'SonarQube Scanner from Maven Central'
+        SONAR_SCANNER = "$SONAR_SCANNER_HOME/bin/sonar-scanner"
         SONAR_PROJECT_KEY = "fe-bib-default-forsider"
         SONAR_SOURCES=''
         SONAR_TESTS=''
