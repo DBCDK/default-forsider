@@ -8,6 +8,9 @@ pipeline {
     }
     triggers {
         githubPush()
+        upstream(
+          upstreamProjects: env.BRANCH_NAME == "main" ? 'Docker-base-node-bump-trigger' : ''
+        )
     }
 
     environment {
