@@ -11,7 +11,8 @@ COPY --chown=node:node . .
 
 # install node packages
 RUN npm set progress=false && npm config set depth 0 && \
-    npm ci
+    npm ci && \
+    npm install --ignore-scripts=false --foreground-scripts sharp
 
 RUN npm test
 
