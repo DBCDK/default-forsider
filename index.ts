@@ -1,12 +1,12 @@
 import fastify from "fastify";
-import { generate, generateArray } from "./svg/svgGenerator";
+import { generate, generateArray, ensureGenerated } from "./svg/svgGenerator";
 import path from "path";
 import { promises as Fs } from "fs";
 import { CoverColor, GeneralMaterialTypeCode, mapMaterialType } from "./utils";
 import { exec } from "child_process";
 // @ts-ignore
 import { log } from "dbc-node-logger";
-import { getMetrics, initHistogram, registerDuration } from "./monitor";
+import { getMetrics } from "./monitor";
 import { createVerifier } from "fast-jwt";
 
 const _ = require("lodash");
@@ -85,9 +85,6 @@ server.register(require("@fastify/static"), {
   root: path.join(__dirname, "images"),
 });
 
-const PERFORMANCE_WAIT_FOR_IMAGE = "wait_for_image";
-initHistogram(PERFORMANCE_WAIT_FOR_IMAGE);
-
 function deleteAllImages() {
   return new Promise((resolve) => {
     exec("rm images/**/*", (err, _stdout, stdErr) => {
@@ -102,10 +99,6 @@ function deleteAllImages() {
   });
 }
 
-function delay(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
 async function fileExists(path: string): Promise<boolean> {
   try {
     await Fs.access(path);
@@ -115,40 +108,31 @@ async function fileExists(path: string): Promise<boolean> {
   }
 }
 
-async function waitForFile(path: string) {
-  const retryBackOff = [100, 500, 1000, 5000, 10000];
-  for (let i = 0; i < retryBackOff.length; i++) {
-    if (await fileExists(path)) {
-      // All good, file exists
-      return;
-    }
-
-    // Not ready yet, wait some time
-    // console.log("not found wait for file ", retryBackOff[i])
-    await delay(retryBackOff[i]);
-  }
-
-  // Uhoh, this is not good, image was not generated, we should monitor this
-  // TODO monitor this
-}
-
-async function decode(uid: string) {
+function decodeJwt(uid: string): ICovers | null {
   try {
-    const decoded = jwtDecoder(uid);
-    return await generate(decoded);
+    return jwtDecoder(uid) as ICovers;
   } catch (e) {
     return null;
   }
 }
 
-// New way of accessing images. Created on the fly from a signed jwt
+// Signed JWT routes: verify, generate if missing (and wait), then serve image
 server.get(`/large/:uid`, async function (request: any, reply: any) {
   try {
     const { uid } = request.params;
-    const { detail }: any = await decode(uid);
-    const imagePath = `images/${detail}`;
-    await waitForFile(imagePath);
-    const res = await Fs.readFile(imagePath);
+    const query = decodeJwt(uid);
+    if (!query) {
+      reply.code(404).send("Not found");
+      return;
+    }
+
+    const { detail, error } = await ensureGenerated(query);
+    if (error || !detail) {
+      reply.code(404).send("Not found");
+      return;
+    }
+
+    const res = await Fs.readFile(`images/${detail}`);
     reply.type("image/jpg");
     reply.code(200).send(res);
   } catch (e) {
@@ -156,30 +140,26 @@ server.get(`/large/:uid`, async function (request: any, reply: any) {
   }
 });
 
-// New way of accessing images. Created on the fly from a signed jwt
 server.get(`/thumbnail/:uid`, async function (request: any, reply: any) {
   try {
     const { uid } = request.params;
-    const { thumbNail }: any = await decode(uid);
-    const imagePath = `images/${thumbNail}`;
-    await waitForFile(imagePath);
-    const res = await Fs.readFile(imagePath);
+    const query = decodeJwt(uid);
+    if (!query) {
+      reply.code(404).send("Not found");
+      return;
+    }
+
+    const { thumbNail, error } = await ensureGenerated(query);
+    if (error || !thumbNail) {
+      reply.code(404).send("Not found");
+      return;
+    }
+
+    const res = await Fs.readFile(`images/${thumbNail}`);
     reply.type("image/jpg");
     reply.code(200).send(res);
   } catch (e) {
     reply.code(404).send("Not found");
-  }
-});
-
-server.addHook("onRequest", async (request, reply) => {
-  // We should have a better way of identifying file access
-  if (
-    request.url.includes("/images") &&
-    (request.url.includes("/large") || request.url.includes("/thumbnail"))
-  ) {
-    const now = performance.now();
-    await waitForFile(request.url);
-    registerDuration(PERFORMANCE_WAIT_FOR_IMAGE, performance.now() - now);
   }
 });
 
@@ -275,18 +255,11 @@ server.get("/", async (request, reply) => {
 
 // Count of images that have taken over 5 s to generate
 let prevOver5Seconds = 0;
-// Count of images that have taken over 5 s to wait for
-let prevOver5SecondsWait = 0;
 server.get("/howru", async (request, reply) => {
   const metrics = await getMetrics();
 
-  // All requests minus requests that take 5s or below
   const over5Seconds =
     metrics.image_generation["<= +Inf"] - metrics.image_generation["<= 5"];
-
-  const over5SecondsWait =
-    metrics[PERFORMANCE_WAIT_FOR_IMAGE]["<= +Inf"] -
-    metrics[PERFORMANCE_WAIT_FOR_IMAGE]["<= 5"];
 
   const alerts = [
     {
@@ -296,17 +269,9 @@ server.get("/howru", async (request, reply) => {
       over5Seconds,
       prevOver5Seconds,
     },
-    // {
-    //   description:
-    //     "Number of times it takes over 5s to fetch image since last time howru was called",
-    //   alert: over5SecondsWait > prevOver5SecondsWait,
-    //   over5SecondsWait,
-    //   prevOver5SecondsWait,
-    // },
   ];
 
   prevOver5Seconds = over5Seconds;
-  prevOver5SecondsWait = over5SecondsWait;
   const ok = !alerts.find((a) => !!a.alert);
 
   const res = {

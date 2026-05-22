@@ -18,14 +18,92 @@ import { ICovers, ICoversArray, checkRequest } from "../index";
 import { registerDuration, initHistogram } from "../monitor";
 
 const _ = require("lodash");
+const getUuid = require("uuid-by-string");
 
 const PERFORMANCE_HISTOGRAM_NAME = "image_generation";
 initHistogram(PERFORMANCE_HISTOGRAM_NAME);
+
+const inFlightGenerations = new Map<string, Promise<void>>();
 
 interface IReturnCover {
   error?: string;
   thumbNail?: string;
   detail?: string;
+}
+
+function coverPaths(uuidHash: string): IReturnCover {
+  return {
+    thumbNail: `${workingDirectory}/thumbnail/${uuidHash}.jpg`,
+    detail: `${workingDirectory}/large/${uuidHash}.jpg`,
+  };
+}
+
+function hashCover(query: ICovers): {
+  error?: string;
+  uuidHash?: string;
+  mappedMaterial?: string;
+  title?: string;
+  colors?: Array<CoverColor>;
+} {
+  const { title, materialType, colors } = query;
+  const status = checkRequest(query);
+
+  if (!status.status) {
+    console.log(status);
+    return { error: status.message };
+  }
+
+  const mappedMaterial = mapMaterialType(materialType);
+  const uuidHash = getUuid(
+    `${title}${mappedMaterial}${colors ? JSON.stringify(colors) : ""}`
+  );
+
+  return { uuidHash, mappedMaterial, title, colors };
+}
+
+async function generateImages(
+  uuidHash: string,
+  mappedMaterial: string,
+  title: string,
+  colors?: Array<CoverColor>
+): Promise<void> {
+  const svgAsString = await read(mappedMaterial);
+  const buf = Buffer.from(replaceInSvg(svgAsString, title, colors));
+
+  await Promise.all(
+    Object.keys(sizes).map((size) => {
+      const imagePath = pathToImage(uuidHash, size);
+      return svg2Image(buf, imagePath, size);
+    })
+  );
+}
+
+/**
+ * Ensure cover images exist. Generates and waits if missing.
+ */
+export async function ensureGenerated(query: ICovers): Promise<IReturnCover> {
+  const hashed = hashCover(query);
+  if (hashed.error || !hashed.uuidHash || !hashed.mappedMaterial || !hashed.title) {
+    return { error: hashed.error };
+  }
+
+  const { uuidHash, mappedMaterial, title, colors } = hashed;
+  const paths = coverPaths(uuidHash);
+
+  if (await doesFileExist(uuidHash)) {
+    return paths;
+  }
+
+  let pending = inFlightGenerations.get(uuidHash);
+  if (!pending) {
+    pending = generateImages(uuidHash, mappedMaterial, title, colors).finally(
+      () => inFlightGenerations.delete(uuidHash)
+    );
+    inFlightGenerations.set(uuidHash, pending);
+  }
+
+  await pending;
+  return paths;
 }
 
 /**
@@ -34,49 +112,26 @@ interface IReturnCover {
  * @param query
  */
 export async function generate(query: ICovers): Promise<IReturnCover> {
-  const { title, materialType, colors } = query;
-
-  const mappedMaterial: string = mapMaterialType(materialType);
-
-  // we need to generate same hash each time - use 'uuid-by-string' @see https://www.npmjs.com/package/uuid-by-string
-  const getUuid = require("uuid-by-string");
-
-  const status = checkRequest(query);
-
-  if (!status.status) {
-    console.log(status);
-    return {
-      error: status.message,
-    };
+  const hashed = hashCover(query);
+  if (hashed.error || !hashed.uuidHash || !hashed.mappedMaterial || !hashed.title) {
+    return { error: hashed.error };
   }
 
-  const uuidHash = getUuid(
-    `${title}${mappedMaterial}${colors ? JSON.stringify(colors) : ""}`
-  );
+  const { uuidHash, mappedMaterial, title, colors } = hashed;
+  const paths = coverPaths(uuidHash);
+
   if (!(await doesFileExist(uuidHash))) {
-    read(mappedMaterial).then((svgAsString) => {
-      // @TODO check string - it might be empty
-
-      const buf = Buffer.from(replaceInSvg(svgAsString, title, colors));
-      Object.keys(sizes).forEach((size) => {
-        const imagePath = pathToImage(uuidHash, size);
-        try {
-          svg2Image(buf, imagePath, size);
-        } catch (e: any) {
-          log.error("Bad image generation", {
-            message: e.message,
-            path: imagePath,
-          });
-        }
-      });
-    });
+    void generateImages(uuidHash, mappedMaterial, title, colors).catch(
+      (e: any) => {
+        log.error("Bad image generation", {
+          message: e.message,
+          uuidHash,
+        });
+      }
+    );
   }
 
-  // @TODO return an object - like : {thumbNail:"thumbnail/uuidhash", detail:"large/uuidhash"}
-  return {
-    thumbNail: `${workingDirectory}/thumbnail/${uuidHash}.jpg`,
-    detail: `${workingDirectory}/large/${uuidHash}.jpg`,
-  };
+  return paths;
 }
 
 /**
@@ -112,33 +167,42 @@ export async function generateArray(
  * @param path
  * @param size
  */
-function svg2Image(svgString: Buffer, path: string, size: string): void {
-  const sizes =
+function svg2Image(
+  svgString: Buffer,
+  path: string,
+  size: string
+): Promise<void> {
+  const dimensions =
     size === "large" ? { width: 300, height: 460 } : { width: 75, height: 115 };
   const timestamp = performance.now();
 
-  sharp(svgString)
-    .resize(sizes)
-    .jpeg()
-    .toFile(`${path}.jpg`, (err: any, info: any) => {
-      const total_ms = performance.now() - timestamp;
-      registerDuration(PERFORMANCE_HISTOGRAM_NAME, total_ms);
+  return new Promise((resolve, reject) => {
+    sharp(svgString)
+      .resize(dimensions)
+      .jpeg()
+      .toFile(`${path}.jpg`, (err: any, info: any) => {
+        const total_ms = performance.now() - timestamp;
+        registerDuration(PERFORMANCE_HISTOGRAM_NAME, total_ms);
 
-      if (err) {
-        log.error("Image generation failed", {
-          path: `${path}.jpg`,
+        if (err) {
+          log.error("Image generation failed", {
+            path: `${path}.jpg`,
+            total_ms,
+          });
+          reject(err);
+          return;
+        }
+
+        log.info("Image generated", {
           total_ms,
+          imgInfo: {
+            path: `${path}.jpg`,
+            size: info.size,
+          },
         });
-        return;
-      }
-      log.info("Image generated", {
-        total_ms,
-        imgInfo: {
-          path: `${path}.jpg`,
-          size: info.size,
-        },
+        resolve();
       });
-    });
+  });
 }
 
 /**
