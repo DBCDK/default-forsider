@@ -132,10 +132,10 @@ async function waitForFile(path: string) {
   // TODO monitor this
 }
 
-function decode(uid: string) {
+async function decode(uid: string) {
   try {
     const decoded = jwtDecoder(uid);
-    return generate(decoded);
+    return await generate(decoded);
   } catch (e) {
     return null;
   }
@@ -145,7 +145,7 @@ function decode(uid: string) {
 server.get(`/large/:uid`, async function (request: any, reply: any) {
   try {
     const { uid } = request.params;
-    const { detail }: any = decode(uid);
+    const { detail }: any = await decode(uid);
     const imagePath = `images/${detail}`;
     await waitForFile(imagePath);
     const res = await Fs.readFile(imagePath);
@@ -160,7 +160,7 @@ server.get(`/large/:uid`, async function (request: any, reply: any) {
 server.get(`/thumbnail/:uid`, async function (request: any, reply: any) {
   try {
     const { uid } = request.params;
-    const { thumbNail }: any = decode(uid);
+    const { thumbNail }: any = await decode(uid);
     const imagePath = `images/${thumbNail}`;
     await waitForFile(imagePath);
     const res = await Fs.readFile(imagePath);
@@ -245,7 +245,7 @@ server.get<{
   },
   async (request, reply) => {
     const customerHeader = request.headers["h-Custom"];
-    const response = generate(request.query);
+    const response = await generate(request.query);
     reply.code(200).send({ response: [response] });
   }
 );
@@ -258,8 +258,8 @@ export interface ICoversArray {
 server.post<{
   Headers: IHeaders;
   Body: ICoversArray;
-}>("/defaultcover/", (request, reply) => {
-  const fisk = generateArray(request.body);
+}>("/defaultcover/", async (request, reply) => {
+  const fisk = await generateArray(request.body);
   reply.code(200).send({ response: fisk });
 });
 

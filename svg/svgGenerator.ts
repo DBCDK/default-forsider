@@ -1,5 +1,4 @@
 import { promises as Fs, stat } from "fs";
-import { existsSync } from "fs";
 import { workingDirectory } from "../index";
 import sharp from "sharp";
 
@@ -34,7 +33,7 @@ interface IReturnCover {
  * Generate a file. Return uid of file. Let graphql api handle url generation.
  * @param query
  */
-export function generate(query: ICovers): IReturnCover {
+export async function generate(query: ICovers): Promise<IReturnCover> {
   const { title, materialType, colors } = query;
 
   const mappedMaterial: string = mapMaterialType(materialType);
@@ -54,7 +53,7 @@ export function generate(query: ICovers): IReturnCover {
   const uuidHash = getUuid(
     `${title}${mappedMaterial}${colors ? JSON.stringify(colors) : ""}`
   );
-  if (!doesFileExist(uuidHash)) {
+  if (!(await doesFileExist(uuidHash))) {
     read(mappedMaterial).then((svgAsString) => {
       // @TODO check string - it might be empty
 
@@ -84,9 +83,14 @@ export function generate(query: ICovers): IReturnCover {
  * Check if file with given uuid exists already.
  * @param uuid
  */
-function doesFileExist(uuid: string): boolean {
+async function doesFileExist(uuid: string): Promise<boolean> {
   const pathToFile = pathToImage(uuid, "large") + ".jpg";
-  return existsSync(pathToFile);
+  try {
+    await Fs.access(pathToFile);
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 /**
@@ -94,11 +98,12 @@ function doesFileExist(uuid: string): boolean {
  * Handle an array of Covers (ICovers). Return an array of uuid's generated.
  * @param payLoad
  */
-export function generateArray(payLoad: any): Array<IReturnCover> {
-  const coverParams = payLoad;
-  const returnValues: Array<IReturnCover> = [];
-  payLoad.forEach((cover: ICovers) => returnValues.push(generate(cover)));
-  return returnValues;
+export async function generateArray(
+  payLoad: any
+): Promise<Array<IReturnCover>> {
+  return Promise.all(
+    payLoad.map((cover: ICovers) => generate(cover))
+  );
 }
 
 /**
