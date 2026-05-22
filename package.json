@@ -36,6 +36,7 @@
     "uuid-by-string": "^4.0.0"
   },
   "devDependencies": {
+    "@babel/preset-env": "^7.29.5",
     "@types/jest": "^29.2.2",
     "@types/node": "^18.8.5",
     "@types/sharp": "^0.31.0",
