@@ -1,6 +1,6 @@
 import fastify from "fastify";
 import { generate, generateArray, getCoverImage } from "./svg/svgGenerator";
-import { clearImageCache } from "./imageCache";
+import { clearImageCache, CoverImageSize } from "./imageCache";
 import path from "path";
 import { promises as Fs } from "fs";
 import { CoverColor, GeneralMaterialTypeCode, mapMaterialType } from "./utils";
@@ -118,39 +118,32 @@ function decodeJwt(uid: string): ICovers | null {
   }
 }
 
-// Signed JWT routes: verify, read or generate, then serve image
-server.get(`/large/:uid`, async function (request: any, reply: any) {
+async function serveSignedCoverImage(
+  uid: string,
+  size: CoverImageSize,
+  reply: any
+): Promise<void> {
   try {
-    const { uid } = request.params;
     const query = decodeJwt(uid);
     if (!query) {
       reply.code(404).send("Not found");
       return;
     }
 
-    const res = await getCoverImage(query, "large");
+    const res = await getCoverImage(query, size);
     reply.type("image/jpg");
     reply.code(200).send(res);
   } catch (e) {
     reply.code(404).send("Not found");
   }
+}
+
+server.get(`/large/:uid`, async (request: any, reply: any) => {
+  await serveSignedCoverImage(request.params.uid, "large", reply);
 });
 
-server.get(`/thumbnail/:uid`, async function (request: any, reply: any) {
-  try {
-    const { uid } = request.params;
-    const query = decodeJwt(uid);
-    if (!query) {
-      reply.code(404).send("Not found");
-      return;
-    }
-
-    const res = await getCoverImage(query, "thumbnail");
-    reply.type("image/jpg");
-    reply.code(200).send(res);
-  } catch (e) {
-    reply.code(404).send("Not found");
-  }
+server.get(`/thumbnail/:uid`, async (request: any, reply: any) => {
+  await serveSignedCoverImage(request.params.uid, "thumbnail", reply);
 });
 
 interface IRequestStatus {

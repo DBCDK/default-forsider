@@ -40,7 +40,7 @@ pipeline {
                 withSonarQubeEnv(installationName: 'sonarqube.dbc.dk') {
                     script {
                         // trigger sonarqube analysis
-                        def sonarOptions = "-Dsonar.branch.name=$BRANCH_NAME"
+                        def sonarOptions = "-Dsonar.branch.name=$BRANCH_NAME -Dsonar.exclusions=**/node_modules/**,**/imageCache.js,**/svg/svgGenerator.js,**/utils.js,**/monitor.js,**/index.js"
                         if (env.BRANCH_NAME != 'main') {
                             sonarOptions += " -Dsonar.newCode.referenceBranch=main"
                         }
