@@ -21,6 +21,8 @@ const _ = require("lodash");
 const server = fastify({ maxParamLength: 2000 });
 const upSince = new Date();
 export const workingDirectory = process.env.IMAGE_DIR || "HEST";
+export const coverDiskPersistenceEnabled =
+  process.env.DISK_PERSISTENCE !== "false";
 
 validateEnvironmentVariables();
 
@@ -55,6 +57,9 @@ function ifNoneMatchIncludes(
  * Check if working directories for storing images are in place
  */
 async function checkDirectories() {
+  if (!coverDiskPersistenceEnabled) {
+    return;
+  }
   const good = await fileExists(`images/${workingDirectory}`);
   if (!good) {
     await Fs.mkdir(`images/${workingDirectory}`);
@@ -98,6 +103,9 @@ const executeBash = async (command: string): Promise<any> => {
  * old working directories - and then delete the old directories
  */
 async function cleanup() {
+  if (!coverDiskPersistenceEnabled) {
+    return;
+  }
   try {
     // first delete files
     await executeBash(
@@ -115,10 +123,13 @@ async function cleanup() {
 
 checkDirectories();
 
-// public folder for (static) images
-server.register(require("@fastify/static"), {
-  root: path.join(__dirname, "images"),
-});
+if (coverDiskPersistenceEnabled) {
+  server.register(require("@fastify/static"), {
+    root: path.join(__dirname, "images"),
+  });
+} else {
+  log.info("Cover disk persistence disabled");
+}
 
 function deleteAllImages() {
   return new Promise((resolve) => {

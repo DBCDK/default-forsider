@@ -1,5 +1,5 @@
 import { promises as Fs, stat } from "fs";
-import { workingDirectory } from "../index";
+import { workingDirectory, coverDiskPersistenceEnabled } from "../index";
 import sharp from "sharp";
 
 // @ts-ignore
@@ -109,11 +109,13 @@ export async function getCoverImage(
   const { uuidHash, mappedMaterial, title, colors } = hashed;
   const imagePath = `${pathToImage(uuidHash, size)}.jpg`;
 
-  try {
-    return await Fs.readFile(imagePath);
-  } catch (err: any) {
-    if (err?.code !== "ENOENT") {
-      throw err;
+  if (coverDiskPersistenceEnabled) {
+    try {
+      return await Fs.readFile(imagePath);
+    } catch (err: any) {
+      if (err?.code !== "ENOENT") {
+        throw err;
+      }
     }
   }
 
@@ -143,7 +145,7 @@ export async function generate(query: ICovers): Promise<IReturnCover> {
   const { uuidHash, mappedMaterial, title, colors } = hashed;
   const paths = coverPaths(uuidHash);
 
-  if (!(await doesFileExist(uuidHash))) {
+  if (coverDiskPersistenceEnabled && !(await doesFileExist(uuidHash))) {
     void generateImages(uuidHash, mappedMaterial, title, colors).catch(
       (e: any) => {
         log.error("Bad image generation", {
@@ -206,7 +208,9 @@ function svg2Image(
     .then(async (buffer) => {
       const total_ms = performance.now() - timestamp;
       registerDuration(PERFORMANCE_HISTOGRAM_NAME, total_ms);
-      await Fs.writeFile(`${path}.jpg`, buffer);
+      if (coverDiskPersistenceEnabled) {
+        await Fs.writeFile(`${path}.jpg`, buffer);
+      }
       log.info("Image generated", {
         total_ms,
         imgInfo: {
