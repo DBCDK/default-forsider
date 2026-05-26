@@ -1,5 +1,6 @@
 import fastify from "fastify";
-import { generate, generateArray, ensureGenerated } from "./svg/svgGenerator";
+import { generate, generateArray, getCoverImage } from "./svg/svgGenerator";
+import { clearImageCache } from "./imageCache";
 import path from "path";
 import { promises as Fs } from "fs";
 import { CoverColor, GeneralMaterialTypeCode, mapMaterialType } from "./utils";
@@ -64,6 +65,7 @@ const executeBash = async (command: string): Promise<any> => {
  */
 async function cleanup() {
   try {
+    clearImageCache();
     // first delete files
     await executeBash(
       `find ./images -type f -name "*.jpg" -not -path "./images/${workingDirectory}/*" -delete`
@@ -116,7 +118,7 @@ function decodeJwt(uid: string): ICovers | null {
   }
 }
 
-// Signed JWT routes: verify, generate if missing (and wait), then serve image
+// Signed JWT routes: verify, read or generate, then serve image
 server.get(`/large/:uid`, async function (request: any, reply: any) {
   try {
     const { uid } = request.params;
@@ -126,13 +128,7 @@ server.get(`/large/:uid`, async function (request: any, reply: any) {
       return;
     }
 
-    const { detail, error } = await ensureGenerated(query);
-    if (error || !detail) {
-      reply.code(404).send("Not found");
-      return;
-    }
-
-    const res = await Fs.readFile(`images/${detail}`);
+    const res = await getCoverImage(query, "large");
     reply.type("image/jpg");
     reply.code(200).send(res);
   } catch (e) {
@@ -149,13 +145,7 @@ server.get(`/thumbnail/:uid`, async function (request: any, reply: any) {
       return;
     }
 
-    const { thumbNail, error } = await ensureGenerated(query);
-    if (error || !thumbNail) {
-      reply.code(404).send("Not found");
-      return;
-    }
-
-    const res = await Fs.readFile(`images/${thumbNail}`);
+    const res = await getCoverImage(query, "thumbnail");
     reply.type("image/jpg");
     reply.code(200).send(res);
   } catch (e) {

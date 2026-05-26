@@ -16,6 +16,12 @@ import {
 } from "../utils";
 import { ICovers, ICoversArray, checkRequest } from "../index";
 import { registerDuration, initHistogram } from "../monitor";
+import {
+  CoverImageSize,
+  coverImageCacheKey,
+  getCachedImage,
+  setCachedImage,
+} from "../imageCache";
 
 const _ = require("lodash");
 const getUuid = require("uuid-by-string");
@@ -23,7 +29,10 @@ const getUuid = require("uuid-by-string");
 const PERFORMANCE_HISTOGRAM_NAME = "image_generation";
 initHistogram(PERFORMANCE_HISTOGRAM_NAME);
 
-const inFlightGenerations = new Map<string, Promise<void>>();
+const inFlightGenerations = new Map<
+  string,
+  Promise<{ large: Buffer; thumbnail: Buffer }>
+>();
 
 interface IReturnCover {
   error?: string;
@@ -66,32 +75,50 @@ async function generateImages(
   mappedMaterial: string,
   title: string,
   colors?: Array<CoverColor>
-): Promise<void> {
+): Promise<{ large: Buffer; thumbnail: Buffer }> {
   const svgAsString = await read(mappedMaterial);
   const buf = Buffer.from(replaceInSvg(svgAsString, title, colors));
 
-  await Promise.all(
-    Object.keys(sizes).map((size) => {
+  const entries = await Promise.all(
+    Object.keys(sizes).map(async (size) => {
       const imagePath = pathToImage(uuidHash, size);
-      return svg2Image(buf, imagePath, size);
+      const imageBuffer = await svg2Image(buf, imagePath, size);
+      return [size, imageBuffer] as const;
     })
   );
+
+  return Object.fromEntries(entries) as { large: Buffer; thumbnail: Buffer };
 }
 
 /**
- * Ensure cover images exist. Generates and waits if missing.
+ * Read cover image from disk, or generate and return buffer without re-reading.
  */
-export async function ensureGenerated(query: ICovers): Promise<IReturnCover> {
+export async function getCoverImage(
+  query: ICovers,
+  size: CoverImageSize
+): Promise<Buffer> {
   const hashed = hashCover(query);
   if (hashed.error || !hashed.uuidHash || !hashed.mappedMaterial || !hashed.title) {
-    return { error: hashed.error };
+    throw new Error(hashed.error || "invalid cover query");
   }
 
   const { uuidHash, mappedMaterial, title, colors } = hashed;
-  const paths = coverPaths(uuidHash);
+  const cacheKey = coverImageCacheKey(workingDirectory, uuidHash, size);
+  const cached = getCachedImage(cacheKey);
+  if (cached) {
+    return cached;
+  }
 
-  if (await doesFileExist(uuidHash)) {
-    return paths;
+  const imagePath = `${pathToImage(uuidHash, size)}.jpg`;
+
+  try {
+    const buffer = await Fs.readFile(imagePath);
+    setCachedImage(cacheKey, buffer);
+    return buffer;
+  } catch (err: any) {
+    if (err?.code !== "ENOENT") {
+      throw err;
+    }
   }
 
   let pending = inFlightGenerations.get(uuidHash);
@@ -102,8 +129,10 @@ export async function ensureGenerated(query: ICovers): Promise<IReturnCover> {
     inFlightGenerations.set(uuidHash, pending);
   }
 
-  await pending;
-  return paths;
+  const images = await pending;
+  const buffer = images[size];
+  setCachedImage(cacheKey, buffer);
+  return buffer;
 }
 
 /**
@@ -171,38 +200,35 @@ function svg2Image(
   svgString: Buffer,
   path: string,
   size: string
-): Promise<void> {
+): Promise<Buffer> {
   const dimensions =
     size === "large" ? { width: 300, height: 460 } : { width: 75, height: 115 };
   const timestamp = performance.now();
 
-  return new Promise((resolve, reject) => {
-    sharp(svgString)
-      .resize(dimensions)
-      .jpeg()
-      .toFile(`${path}.jpg`, (err: any, info: any) => {
-        const total_ms = performance.now() - timestamp;
-        registerDuration(PERFORMANCE_HISTOGRAM_NAME, total_ms);
-
-        if (err) {
-          log.error("Image generation failed", {
-            path: `${path}.jpg`,
-            total_ms,
-          });
-          reject(err);
-          return;
-        }
-
-        log.info("Image generated", {
-          total_ms,
-          imgInfo: {
-            path: `${path}.jpg`,
-            size: info.size,
-          },
-        });
-        resolve();
+  return sharp(svgString)
+    .resize(dimensions)
+    .jpeg()
+    .toBuffer()
+    .then(async (buffer) => {
+      const total_ms = performance.now() - timestamp;
+      registerDuration(PERFORMANCE_HISTOGRAM_NAME, total_ms);
+      await Fs.writeFile(`${path}.jpg`, buffer);
+      log.info("Image generated", {
+        total_ms,
+        imgInfo: {
+          path: `${path}.jpg`,
+          size: buffer.length,
+        },
       });
-  });
+      return buffer;
+    })
+    .catch((err: any) => {
+      log.error("Image generation failed", {
+        path: `${path}.jpg`,
+        message: err.message,
+      });
+      throw err;
+    });
 }
 
 /**
