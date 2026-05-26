@@ -16,12 +16,6 @@ import {
 } from "../utils";
 import { ICovers, ICoversArray, checkRequest } from "../index";
 import { registerDuration, initHistogram } from "../monitor";
-import {
-  CoverImageSize,
-  coverImageCacheKey,
-  getCachedImage,
-  setCachedImage,
-} from "../imageCache";
 
 const _ = require("lodash");
 const getUuid = require("uuid-by-string");
@@ -33,6 +27,8 @@ const inFlightGenerations = new Map<
   string,
   Promise<{ large: Buffer; thumbnail: Buffer }>
 >();
+
+export type CoverImageSize = "large" | "thumbnail";
 
 interface IReturnCover {
   error?: string;
@@ -111,18 +107,10 @@ export async function getCoverImage(
   }
 
   const { uuidHash, mappedMaterial, title, colors } = hashed;
-  const cacheKey = coverImageCacheKey(workingDirectory, uuidHash, size);
-  const cached = getCachedImage(cacheKey);
-  if (cached) {
-    return cached;
-  }
-
   const imagePath = `${pathToImage(uuidHash, size)}.jpg`;
 
   try {
-    const buffer = await Fs.readFile(imagePath);
-    setCachedImage(cacheKey, buffer);
-    return buffer;
+    return await Fs.readFile(imagePath);
   } catch (err: any) {
     if (err?.code !== "ENOENT") {
       throw err;
@@ -138,9 +126,7 @@ export async function getCoverImage(
   }
 
   const images = await pending;
-  const buffer = images[size];
-  setCachedImage(cacheKey, buffer);
-  return buffer;
+  return images[size];
 }
 
 /**

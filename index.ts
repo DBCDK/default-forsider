@@ -1,6 +1,12 @@
 import fastify from "fastify";
-import { generate, generateArray, getCoverImage, getCoverUuidHash } from "./svg/svgGenerator";
-import { clearImageCache, CoverImageSize } from "./imageCache";
+import {
+  generate,
+  generateArray,
+  getCoverImage,
+  getCoverUuidHash,
+  CoverImageSize,
+} from "./svg/svgGenerator";
+import { configureRedis, withRedisCache } from "@dbcdk/febib-shared/server/redis";
 import path from "path";
 import { promises as Fs } from "fs";
 import { CoverColor, GeneralMaterialTypeCode, mapMaterialType } from "./utils";
@@ -9,13 +15,23 @@ import { exec } from "child_process";
 import { log } from "dbc-node-logger";
 import { getMetrics } from "./monitor";
 import { createVerifier } from "fast-jwt";
+import { validateEnvironmentVariables } from "./validateEnvironmentVariables";
 
 const _ = require("lodash");
 const server = fastify({ maxParamLength: 2000 });
 const upSince = new Date();
 export const workingDirectory = process.env.IMAGE_DIR || "HEST";
 
+validateEnvironmentVariables();
+
 const jwtDecoder = createVerifier({ key: process.env.DEFAULT_FORSIDER_KEY });
+
+configureRedis({
+  logger: {
+    info: (message: string, meta?: Record<string, unknown>) =>
+      log.info(message, meta),
+  },
+});
 
 const COVER_IMAGE_CACHE_CONTROL =
   process.env.COVER_IMAGE_CACHE_CONTROL ||
@@ -83,7 +99,6 @@ const executeBash = async (command: string): Promise<any> => {
  */
 async function cleanup() {
   try {
-    clearImageCache();
     // first delete files
     await executeBash(
       `find ./images -type f -name "*.jpg" -not -path "./images/${workingDirectory}/*" -delete`
@@ -136,6 +151,23 @@ function decodeJwt(uid: string): ICovers | null {
   }
 }
 
+const resolveSignedCoverBase64 = withRedisCache(
+  async (jwt: string, size: CoverImageSize) => {
+    const query = decodeJwt(jwt);
+    if (!query) {
+      throw new Error("invalid jwt");
+    }
+    const buffer = await getCoverImage(query, size);
+    return buffer.toString("base64");
+  },
+  {
+    ttlSeconds: Number(process.env.COVER_REDIS_TTL_SECONDS) || 31536000,
+    keyPrefix: "cover",
+    key: (jwt: string, size: CoverImageSize) =>
+      `${workingDirectory}:${size}:${jwt}`,
+  }
+);
+
 async function serveSignedCoverImage(
   request: any,
   uid: string,
@@ -164,9 +196,9 @@ async function serveSignedCoverImage(
       return;
     }
 
-    const res = await getCoverImage(query, size);
+    const base64 = await resolveSignedCoverBase64(uid, size);
     reply.type("image/jpg");
-    reply.code(200).send(res);
+    reply.code(200).send(Buffer.from(base64, "base64"));
   } catch (e) {
     reply.code(404).send("Not found");
   }
