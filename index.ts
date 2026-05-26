@@ -1,5 +1,5 @@
 import fastify from "fastify";
-import { generate, generateArray, getCoverImage } from "./svg/svgGenerator";
+import { generate, generateArray, getCoverImage, getCoverUuidHash } from "./svg/svgGenerator";
 import { clearImageCache, CoverImageSize } from "./imageCache";
 import path from "path";
 import { promises as Fs } from "fs";
@@ -16,6 +16,24 @@ const upSince = new Date();
 export const workingDirectory = process.env.IMAGE_DIR || "HEST";
 
 const jwtDecoder = createVerifier({ key: process.env.DEFAULT_FORSIDER_KEY });
+
+const COVER_IMAGE_CACHE_CONTROL =
+  process.env.COVER_IMAGE_CACHE_CONTROL ||
+  "public, max-age=31536000, immutable";
+
+function coverImageETag(uuidHash: string): string {
+  return `"${uuidHash}"`;
+}
+
+function ifNoneMatchIncludes(
+  ifNoneMatch: string | undefined,
+  etag: string
+): boolean {
+  if (!ifNoneMatch) {
+    return false;
+  }
+  return ifNoneMatch.split(",").some((value) => value.trim() === etag);
+}
 
 /**
  * Check if working directories for storing images are in place
@@ -119,6 +137,7 @@ function decodeJwt(uid: string): ICovers | null {
 }
 
 async function serveSignedCoverImage(
+  request: any,
   uid: string,
   size: CoverImageSize,
   reply: any
@@ -127,6 +146,21 @@ async function serveSignedCoverImage(
     const query = decodeJwt(uid);
     if (!query) {
       reply.code(404).send("Not found");
+      return;
+    }
+
+    const uuidHash = getCoverUuidHash(query);
+    if (!uuidHash) {
+      reply.code(404).send("Not found");
+      return;
+    }
+
+    const etag = coverImageETag(uuidHash);
+    reply.header("Cache-Control", COVER_IMAGE_CACHE_CONTROL);
+    reply.header("ETag", etag);
+
+    if (ifNoneMatchIncludes(request.headers["if-none-match"], etag)) {
+      reply.code(304).send();
       return;
     }
 
@@ -139,11 +173,11 @@ async function serveSignedCoverImage(
 }
 
 server.get(`/large/:uid`, async (request: any, reply: any) => {
-  await serveSignedCoverImage(request.params.uid, "large", reply);
+  await serveSignedCoverImage(request, request.params.uid, "large", reply);
 });
 
 server.get(`/thumbnail/:uid`, async (request: any, reply: any) => {
-  await serveSignedCoverImage(request.params.uid, "thumbnail", reply);
+  await serveSignedCoverImage(request, request.params.uid, "thumbnail", reply);
 });
 
 interface IRequestStatus {

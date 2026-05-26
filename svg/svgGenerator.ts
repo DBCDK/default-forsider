@@ -70,6 +70,14 @@ function hashCover(query: ICovers): {
   return { uuidHash, mappedMaterial, title, colors };
 }
 
+export function getCoverUuidHash(query: ICovers): string | null {
+  const hashed = hashCover(query);
+  if (hashed.error || !hashed.uuidHash) {
+    return null;
+  }
+  return hashed.uuidHash;
+}
+
 async function generateImages(
   uuidHash: string,
   mappedMaterial: string,
