@@ -23,10 +23,7 @@ const getUuid = require("uuid-by-string");
 const PERFORMANCE_HISTOGRAM_NAME = "image_generation";
 initHistogram(PERFORMANCE_HISTOGRAM_NAME);
 
-const inFlightGenerations = new Map<
-  string,
-  Promise<{ large: Buffer; thumbnail: Buffer }>
->();
+const inFlightGenerations = new Map<string, Promise<Buffer>>();
 
 export type CoverImageSize = "large" | "thumbnail";
 
@@ -78,20 +75,13 @@ async function generateImages(
   uuidHash: string,
   mappedMaterial: string,
   title: string,
+  size: CoverImageSize,
   colors?: Array<CoverColor>
-): Promise<{ large: Buffer; thumbnail: Buffer }> {
+): Promise<Buffer> {
   const svgAsString = await read(mappedMaterial);
-  const buf = Buffer.from(replaceInSvg(svgAsString, title, colors));
-
-  const entries = await Promise.all(
-    Object.keys(sizes).map(async (size) => {
-      const imagePath = pathToImage(uuidHash, size);
-      const imageBuffer = await svg2Image(buf, imagePath, size);
-      return [size, imageBuffer] as const;
-    })
-  );
-
-  return Object.fromEntries(entries) as { large: Buffer; thumbnail: Buffer };
+  const buf = Buffer.from(replaceInSvg(svgAsString, title, uuidHash, colors));
+  const imagePath = pathToImage(uuidHash, size);
+  return svg2Image(buf, imagePath, size);
 }
 
 /**
@@ -119,16 +109,20 @@ export async function getCoverImage(
     }
   }
 
-  let pending = inFlightGenerations.get(uuidHash);
+  const inFlightKey = `${uuidHash}:${size}`;
+  let pending = inFlightGenerations.get(inFlightKey);
   if (!pending) {
-    pending = generateImages(uuidHash, mappedMaterial, title, colors).finally(
-      () => inFlightGenerations.delete(uuidHash)
-    );
-    inFlightGenerations.set(uuidHash, pending);
+    pending = generateImages(
+      uuidHash,
+      mappedMaterial,
+      title,
+      size,
+      colors
+    ).finally(() => inFlightGenerations.delete(inFlightKey));
+    inFlightGenerations.set(inFlightKey, pending);
   }
 
-  const images = await pending;
-  return images[size];
+  return pending;
 }
 
 /**
@@ -146,14 +140,16 @@ export async function generate(query: ICovers): Promise<IReturnCover> {
   const paths = coverPaths(uuidHash);
 
   if (coverDiskPersistenceEnabled && !(await doesFileExist(uuidHash))) {
-    void generateImages(uuidHash, mappedMaterial, title, colors).catch(
-      (e: any) => {
-        log.error("Bad image generation", {
-          message: e.message,
-          uuidHash,
-        });
-      }
-    );
+    void Promise.all(
+      (["large", "thumbnail"] as const).map((size) =>
+        generateImages(uuidHash, mappedMaterial, title, size, colors)
+      )
+    ).catch((e: any) => {
+      log.error("Bad image generation", {
+        message: e.message,
+        uuidHash,
+      });
+    });
   }
 
   return paths;
@@ -240,29 +236,32 @@ function pathToImage(uuidHash: string, size: string): string {
 }
 
 /**
- * Get a random color from colors enum.
+ * Pick a fill color deterministically from uuidHash so large/thumbnail match.
  */
-function randomColor(colors?: Array<CoverColor>): CoverColor {
+function pickColor(uuidHash: string, colors?: Array<CoverColor>): CoverColor {
   const items = colors || defaultCovers;
-  const keys = Object.keys(items);
-  const random: number = +keys[Math.floor(Math.random() * keys.length)];
-
-  return items[random];
+  let sum = 0;
+  for (let i = 0; i < uuidHash.length; i++) {
+    sum += uuidHash.charCodeAt(i);
+  }
+  return items[sum % items.length];
 }
 
 /**
- * Replace in template with given values and a random fill color.
+ * Replace in template with given values and a fill color.
  * Handle and insert title af cover.
  * @param svg
  * @param title
+ * @param uuidHash
  * @param colors
  */
 function replaceInSvg(
   svg: string,
   title: string,
+  uuidHash: string,
   colors?: Array<CoverColor>
 ): string {
-  const svgColor = randomColor(colors);
+  const svgColor = pickColor(uuidHash, colors);
 
   const maxWordLength = Math.max(
     ...title?.split(/(.*?[\s:;,|-])/g).map((str) => str.trim().length)
