@@ -1,6 +1,6 @@
-import { promises as Fs, stat } from "fs";
 import { workingDirectory, coverDiskPersistenceEnabled } from "../index";
 import sharp from "sharp";
+import { access, readFile, readFileUtf8, writeFile } from "../diskIo";
 
 // @ts-ignore
 import { log } from "dbc-node-logger";
@@ -101,7 +101,7 @@ export async function getCoverImage(
 
   if (coverDiskPersistenceEnabled) {
     try {
-      return await Fs.readFile(imagePath);
+      return await readFile(imagePath);
     } catch (err: any) {
       if (err?.code !== "ENOENT") {
         throw err;
@@ -162,7 +162,7 @@ export async function generate(query: ICovers): Promise<IReturnCover> {
 async function doesFileExist(uuid: string): Promise<boolean> {
   const pathToFile = pathToImage(uuid, "large") + ".jpg";
   try {
-    await Fs.access(pathToFile);
+    await access(pathToFile);
     return true;
   } catch {
     return false;
@@ -205,7 +205,7 @@ function svg2Image(
       const total_ms = performance.now() - timestamp;
       registerDuration(PERFORMANCE_HISTOGRAM_NAME, total_ms);
       if (coverDiskPersistenceEnabled) {
-        await Fs.writeFile(`${path}.jpg`, buffer);
+        await writeFile(`${path}.jpg`, buffer);
       }
       log.info("Image generated", {
         total_ms,
@@ -1137,9 +1137,7 @@ async function read(materialType: string): Promise<string> {
       return templateCache[materialType];
     }
     // read the template
-    templateCache[materialType] = Fs.readFile(`templates/${materialType}.svg`, {
-      encoding: "utf8",
-    });
+    templateCache[materialType] = readFileUtf8(`templates/${materialType}.svg`);
     return await templateCache[materialType];
   } catch (e) {
     console.log(`Read  failed:`, {

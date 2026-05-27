@@ -8,7 +8,7 @@ import {
 } from "./svg/svgGenerator";
 import { configureRedis, withRedisCache } from "@dbcdk/febib-shared/server/redis";
 import path from "path";
-import { promises as Fs } from "fs";
+import { access, mkdir } from "./diskIo";
 import { CoverColor, GeneralMaterialTypeCode, mapMaterialType } from "./utils";
 import { exec } from "child_process";
 // @ts-ignore
@@ -62,9 +62,9 @@ async function checkDirectories() {
   }
   const good = await fileExists(`images/${workingDirectory}`);
   if (!good) {
-    await Fs.mkdir(`images/${workingDirectory}`);
-    await Fs.mkdir(`images/${workingDirectory}/large`);
-    await Fs.mkdir(`images/${workingDirectory}/thumbnail`);
+    await mkdir(`images/${workingDirectory}`);
+    await mkdir(`images/${workingDirectory}/large`);
+    await mkdir(`images/${workingDirectory}/thumbnail`);
   }
 }
 
@@ -147,7 +147,7 @@ function deleteAllImages() {
 
 async function fileExists(path: string): Promise<boolean> {
   try {
-    await Fs.access(path);
+    await access(path);
     return true;
   } catch (error) {
     return false;
