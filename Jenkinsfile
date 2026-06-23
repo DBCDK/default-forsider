@@ -1,5 +1,28 @@
 #!groovy​
 
+// ------- Dependency-track library ---------
+// Import `generateSbomNpm()` and `dependencyTrackGate()`
+@Library('dependency-track') _
+
+// ------- Dependency-track configuration ---------
+def DT_TEAM_NAME = "febib"
+def DT_PROJECT_TYPE = "javascript"
+def OUTPUT_FOLDER = "./dependency-track-folder"
+def SBOM_TYPE = "application" // type: `application | library | framework`
+
+// Root project only (add more entries if you later split into subprojects)
+def DT_PROJECTS = [
+    [folder: "."],
+].collect { project ->
+    [
+        folder: project.folder,
+        sbomType: project.sbomType ?: SBOM_TYPE,
+        teamName: project.teamName ?: DT_TEAM_NAME,
+        projectType: project.projectType ?: DT_PROJECT_TYPE,
+        outputFolder: project.outputFolder ?: OUTPUT_FOLDER,
+    ]
+}
+
 def app
 
 pipeline {
@@ -57,6 +80,33 @@ pipeline {
                 // wait for analysis results
                 timeout(time: 1, unit: 'HOURS') {
                     waitForQualityGate abortPipeline: true
+                }
+            }
+        }
+        stage("Supply Chain Gate") {
+            agent {
+                docker {
+                    label 'devel11'
+                    image "docker-dbc.artifacts.dbccloud.dk/dbc-node:node25"
+                    alwaysPull true
+                }
+            }
+            steps {
+                script {
+                    for (def project : DT_PROJECTS) {
+                        dir(project.folder) {
+                            generateSbomNpm(
+                                sbomType: project.sbomType,
+                                outputFolder: project.outputFolder
+                            )
+                            dependencyTrackGate(
+                                projectBom: "${project.outputFolder}/sbom.json",
+                                projectTeam: project.teamName,
+                                projectType: project.projectType,
+                                *:(fileExists("${project.outputFolder}/vex.json") ? [projectVex: "${project.outputFolder}/vex.json"] : [:])
+                            )
+                        }
+                    }
                 }
             }
         }
